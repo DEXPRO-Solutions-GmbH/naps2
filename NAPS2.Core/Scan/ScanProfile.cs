@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Serialization;
+using NAPS2.Barcode;
 using NAPS2.ImportExport;
 using NAPS2.Lang.Resources;
 using NAPS2.Scan.Wia.Native;
@@ -65,6 +66,8 @@ namespace NAPS2.Scan
         public bool IsDefault { get; set; }
 
         public int Version { get; set; }
+
+        public BarcodeDetectionMode DetectBarcodes { get; set; }
 
         public bool UseNativeUI { get; set; }
 

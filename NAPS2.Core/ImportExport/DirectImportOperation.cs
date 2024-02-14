@@ -42,7 +42,7 @@ namespace NAPS2.ImportExport
                         ScannedImage img;
                         using (var bitmap = new Bitmap(Path.Combine(data.RecoveryFolder, ir.FileName)))
                         {
-                            img = new ScannedImage(bitmap, ir.BitDepth, ir.HighQuality, -1);
+                            img = new ScannedImage(bitmap, ir.BitDepth, ir.HighQuality, -1, ir.Barcodes, ir.PatchCode);
                         }
                         foreach (var transform in ir.TransformList)
                         {

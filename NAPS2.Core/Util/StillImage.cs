@@ -50,11 +50,11 @@ namespace NAPS2.Util
 
             using (var key1 = Registry.LocalMachine.CreateSubKey(REGKEY_AUTOPLAY_HANDLER_NAPS2))
             {
-                key1.SetValue("Action", "Scan with NAPS2");
+                key1.SetValue("Action", "Scan with DOCUMENTS Scanner");
                 key1.SetValue("CLSID", "WIACLSID");
                 key1.SetValue("DefaultIcon", "sti.dll,0");
                 key1.SetValue("InitCmdLine", $"/WiaCmd;{exe} /StiDevice:%1 /StiEvent:%2;");
-                key1.SetValue("Provider", "NAPS2");
+                key1.SetValue("Provider", "DOCUMENTS Scanner");
             }
 
             using (var key2 = Registry.LocalMachine.CreateSubKey(REGKEY_STI_APP))
@@ -65,9 +65,9 @@ namespace NAPS2.Util
             using (var key3 = Registry.LocalMachine.CreateSubKey(REGKEY_STI_EVENT_NAPS2))
             {
                 key3.SetValue("Cmdline", $"{exe} /StiDevice:%1 /StiEvent:%2");
-                key3.SetValue("Desc", "Scan with NAPS2");
+                key3.SetValue("Desc", "Scan with DOCUMENTS Scanner");
                 key3.SetValue("Icon", $"{exe},0");
-                key3.SetValue("Name", "NAPS2");
+                key3.SetValue("Name", "DOCUMENTS Scanner");
             }
         }
 

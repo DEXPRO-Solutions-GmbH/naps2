@@ -9,6 +9,7 @@ namespace NAPS2.ImportExport
         None,
         FilePerPage,
         FilePerScan,
-        PatchT
+        PatchT,
+        Barcode
     }
 }

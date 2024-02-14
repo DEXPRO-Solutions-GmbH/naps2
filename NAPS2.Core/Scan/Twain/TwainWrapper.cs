@@ -16,6 +16,7 @@ using NAPS2.WinForms;
 using NTwain;
 using NTwain.Data;
 using NAPS2.Util;
+using NAPS2.Barcode;
 
 namespace NAPS2.Scan.Twain
 {
@@ -26,6 +27,7 @@ namespace NAPS2.Scan.Twain
         private readonly IFormFactory formFactory;
         private readonly IBlankDetector blankDetector;
         private readonly ScannedImageHelper scannedImageHelper;
+        private readonly BarcodeProcessor barcodeProcessor;
 
         static TwainWrapper()
         {
@@ -45,11 +47,12 @@ namespace NAPS2.Scan.Twain
 #endif
         }
 
-        public TwainWrapper(IFormFactory formFactory, IBlankDetector blankDetector, ScannedImageHelper scannedImageHelper)
+        public TwainWrapper(IFormFactory formFactory, IBlankDetector blankDetector, ScannedImageHelper scannedImageHelper, BarcodeProcessor barcodeProcessor)
         {
             this.formFactory = formFactory;
             this.blankDetector = blankDetector;
             this.scannedImageHelper = scannedImageHelper;
+            this.barcodeProcessor = barcodeProcessor;
         }
 
         public List<ScanDevice> GetDeviceList(TwainImpl twainImpl)
@@ -170,7 +173,15 @@ namespace NAPS2.Scan.Twain
                                     }
                                 }
                             }
+
                             scannedImageHelper.PostProcessStep2(image, result, scanProfile, scanParams, pageNumber);
+
+                            if (barcodeProcessor.ProcessPage(image, scanParams.DetectBarcodes.SelectHighest(scanProfile.DetectBarcodes), result, scanParams.BarcodeParams))
+                            {
+                                image.Dispose();
+                                return;
+                            }
+
                             string tempPath = scannedImageHelper.SaveForBackgroundOcr(result, scanParams);
                             runBackgroundOcr(image, scanParams, tempPath);
                             source.Put(image);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using NAPS2.Barcode;
 using NAPS2.ClientServer;
 using NAPS2.Config;
 using NAPS2.Lang.Resources;
@@ -85,6 +86,8 @@ namespace NAPS2.WinForms
             SelectPageSize();
             cmbScale.SelectedIndex = (int)ScanProfile.AfterScanScale;
             cmbAlign.SelectedIndex = (int)ScanProfile.PageAlign;
+            cbBarcodeDetection.Checked = ScanProfile.DetectBarcodes != BarcodeDetectionMode.None;
+            cbRemoveCoverPages.Checked = ScanProfile.DetectBarcodes == BarcodeDetectionMode.DetectAndRemovePage;
 
             cbAutoSave.Checked = ScanProfile.EnableAutoSave;
 
@@ -93,6 +96,8 @@ namespace NAPS2.WinForms
 
             rdbNative.Checked = ScanProfile.UseNativeUI;
             rdbConfig.Checked = !ScanProfile.UseNativeUI;
+
+            cbRemoveCoverPages.Enabled = cbBarcodeDetection.Checked;
 
             // Start triggering onChange events again
             suppressChangeEvent = false;
@@ -320,7 +325,8 @@ namespace NAPS2.WinForms
 
                 ExcludeBlankPages = ScanProfile.ExcludeBlankPages,
                 BlankPageWhiteThreshold = ScanProfile.BlankPageWhiteThreshold,
-                BlankPageCoverageThreshold = ScanProfile.BlankPageCoverageThreshold
+                BlankPageCoverageThreshold = ScanProfile.BlankPageCoverageThreshold,
+                DetectBarcodes = cbBarcodeDetection.Checked ? (cbRemoveCoverPages.Checked ? BarcodeDetectionMode.DetectAndRemovePage : BarcodeDetectionMode.Detect) : BarcodeDetectionMode.None
             };
         }
 
@@ -532,6 +538,16 @@ namespace NAPS2.WinForms
                 useProxy = form.UseProxy;
                 UpdateEnabledControls();
             }
+        }
+
+        private void cbBarcodeDetection_CheckedChanged(object sender, EventArgs e)
+        {
+            cbRemoveCoverPages.Enabled = cbBarcodeDetection.Checked;
+        }
+
+        private void cbRemoveCoverPages_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

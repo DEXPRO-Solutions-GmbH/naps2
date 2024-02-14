@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using NAPS2.Barcode;
 using NAPS2.Config;
 using NAPS2.Ocr;
 using NAPS2.Operation;

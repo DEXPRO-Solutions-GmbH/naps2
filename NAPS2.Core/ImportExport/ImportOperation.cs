@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using NAPS2.Barcode;
 using NAPS2.Lang.Resources;
 using NAPS2.Logging;
 using NAPS2.Operation;
@@ -13,10 +14,12 @@ namespace NAPS2.ImportExport
     public class ImportOperation : OperationBase
     {
         private readonly IScannedImageImporter scannedImageImporter;
+        private readonly BarcodeProcessor barcodeProcessor;
 
-        public ImportOperation(IScannedImageImporter scannedImageImporter)
+        public ImportOperation(IScannedImageImporter scannedImageImporter, BarcodeProcessor barcodeProcessor)
         {
             this.scannedImageImporter = scannedImageImporter;
+            this.barcodeProcessor = barcodeProcessor;
 
             ProgressTitle = MiscResources.ImportProgress;
             AllowCancel = true;
@@ -35,6 +38,7 @@ namespace NAPS2.ImportExport
             {
                 try
                 {
+                    barcodeProcessor.NewBatch();
                     foreach (var fileName in filesToImport)
                     {
                         try

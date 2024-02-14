@@ -266,12 +266,12 @@ namespace NAPS2.Scan.Batch
                 {
                     return;
                 }
-                var subPath = fileNamePlaceholders.SubstitutePlaceholders(Settings.SavePath, now, true, i);
+                var subPath = fileNamePlaceholders.SubstitutePlaceholders(Settings.SavePath, now, true, i, barcode: images.FirstOrDefault()?.Barcodes?.FirstOrDefault()?.Text);
                 if (GetSavePathExtension().ToLower() == ".pdf")
                 {
                     if (File.Exists(subPath))
                     {
-                        subPath = fileNamePlaceholders.SubstitutePlaceholders(subPath, now, true, 0, 1);
+                        subPath = fileNamePlaceholders.SubstitutePlaceholders(subPath, now, true, 0, 1, barcode: images.FirstOrDefault()?.Barcodes?.FirstOrDefault()?.Text);
                     }
                     var snapshots = images.Select(x => x.Preserve()).ToList();
                     try

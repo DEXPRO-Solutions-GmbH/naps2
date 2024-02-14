@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -25,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'InstallerEXE|x86'">
     <OutputPath>bin\InstallerEXE\</OutputPath>
@@ -35,6 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'InstallerMSI|x86'">
     <OutputPath>bin\InstallerMSI\</OutputPath>
@@ -45,6 +47,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Standalone|x86' ">
     <OutputPath>bin\Standalone\</OutputPath>
@@ -55,6 +58,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugLang|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -65,14 +69,20 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
     <DefineConstants>DEBUG;TRACE;NONWINDOWS</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>1.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
       <HintPath>..\packages\CommandLineParser.1.9.71\lib\net40\CommandLine.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Ghostscript.NET, Version=1.2.1.0, Culture=neutral, PublicKeyToken=f85051de34525b59, processorArchitecture=MSIL">
       <HintPath>..\packages\Ghostscript.NET.1.2.1\lib\net40\Ghostscript.NET.dll</HintPath>
@@ -106,6 +116,7 @@
       <HintPath>..\NAPS2\Setup\lib\PdfSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -113,6 +124,18 @@
       <HintPath>..\packages\Microsoft.Bcl.1.1.8\lib\net40\System.IO.dll</HintPath>
     </Reference>
     <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http, Version=2.2.20.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.20\lib\net40\System.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Extensions, Version=2.2.20.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.20\lib\net40\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives, Version=2.2.20.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.20\lib\net40\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest, Version=2.2.20.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.20\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime, Version=2.6.8.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.1.1.8\lib\net40\System.Runtime.dll</HintPath>
     </Reference>
@@ -136,6 +159,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Automation\Service\ServiceComponentInstallPrompt.cs" />
+    <Compile Include="Automation\Service\ServiceErrorOutput.cs" />
+    <Compile Include="Automation\Service\ServiceOperationProgress.cs" />
+    <Compile Include="Automation\Service\ServiceOverwritePrompt.cs" />
+    <Compile Include="Automation\Service\ServicePdfPasswordProvider.cs" />
+    <Compile Include="Barcode\BarcodeDetectionMode.cs" />
+    <Compile Include="Barcode\BarcodeDetectOperation.cs" />
+    <Compile Include="Barcode\BarcodeDetector.cs" />
+    <Compile Include="Barcode\BarcodeParams.cs" />
+    <Compile Include="Barcode\BarcodeProcessor.cs" />
+    <Compile Include="Barcode\BarcodeResult.cs" />
+    <Compile Include="Barcode\BarcodeSettingsContainer.cs" />
+    <Compile Include="Barcode\Binding.cs" />
+    <Compile Include="Barcode\IBarcodeDetector.cs" />
     <Compile Include="ClientCreds.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -157,12 +194,27 @@
     <Compile Include="ClientServer\ScanCallback.cs" />
     <Compile Include="ClientServer\ScanService.cs" />
     <Compile Include="ClientServer\ServerDiscovery.cs" />
+    <Compile Include="Config\AutomatedScanningConfigManager.cs" />
     <Compile Include="Dependencies\ComponentManager.cs" />
     <Compile Include="Dependencies\DownloadMirror.cs" />
     <Compile Include="Dependencies\MultiFileExternalComponent.cs" />
     <Compile Include="Dependencies\IExternalComponent.cs" />
+    <Compile Include="ImportExport\Documents\DocumentsSettings.cs" />
+    <Compile Include="ImportExport\Documents\DocumentsSettingsContainer.cs" />
+    <Compile Include="ImportExport\Documents\DocumentsUploader.cs" />
+    <Compile Include="ImportExport\Documents\HttpHelpers.cs" />
+    <Compile Include="ImportExport\Documents\Models\LoginResponse.cs" />
+    <Compile Include="ImportExport\Documents\Models\SystemResponse.cs" />
+    <Compile Include="ImportExport\Documents\Models\UploadResponse.cs" />
+    <Compile Include="ImportExport\Documents\Models\User.cs" />
     <Compile Include="ImportExport\Email\Mapi\MapiWrapper.cs" />
     <Compile Include="ImportExport\Pdf\GhostscriptManager.cs" />
+    <Compile Include="ImportExport\Protocol\ProtocolHandler.cs" />
+    <Compile Include="ImportExport\Protocol\ProtocolMessage.cs" />
+    <Compile Include="ImportExport\Squeeze\Model\DocumentClass.cs" />
+    <Compile Include="ImportExport\Squeeze\SqueezeSettings.cs" />
+    <Compile Include="ImportExport\Squeeze\SqueezeSettingsContainer.cs" />
+    <Compile Include="ImportExport\Squeeze\SqueezeClient.cs" />
     <Compile Include="Logging\Event.cs" />
     <Compile Include="Logging\EventType.cs" />
     <Compile Include="Logging\IEventLogger.cs" />
@@ -227,6 +279,10 @@
     <Compile Include="Update\UpdateOperation.cs" />
     <Compile Include="Update\UpdateInfo.cs" />
     <Compile Include="Update\UpdateChecker.cs" />
+    <Compile Include="Util\Color\ColorConverting.cs" />
+    <Compile Include="Util\Color\HsbColor.cs" />
+    <Compile Include="Util\Color\HslColor.cs" />
+    <Compile Include="Util\Color\RgbColor.cs" />
     <Compile Include="Util\DebugTimer.cs" />
     <Compile Include="Util\DefaultInvoker.cs" />
     <Compile Include="Util\DeferredAction.cs" />
@@ -246,11 +302,31 @@
     <Compile Include="Util\WebClientExtensions.cs" />
     <Compile Include="Util\Win32Window.cs" />
     <Compile Include="Logging\WindowsEventLogger.cs" />
+    <Compile Include="WinForms\DarkToolStripColorScheme.cs" />
+    <Compile Include="WinForms\DarkToolStripRenderer.cs" />
+    <Compile Include="WinForms\FBarcodeSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WinForms\FBarcodeSettings.Designer.cs">
+      <DependentUpon>FBarcodeSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WinForms\FDocumentsSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WinForms\FDocumentsSettings.Designer.cs">
+      <DependentUpon>FDocumentsSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="WinForms\FProxyConfig.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="WinForms\FProxyConfig.Designer.cs">
       <DependentUpon>FProxyConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WinForms\FSqueezeSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WinForms\FSqueezeSettings.Designer.cs">
+      <DependentUpon>FSqueezeSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="WinForms\ImageForm.cs">
       <SubType>Form</SubType>
@@ -758,6 +834,39 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Icons.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FDesktop.aa.resx">
+      <DependentUpon>FDesktop.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FDesktop.en-SD.resx">
+      <DependentUpon>FDesktop.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FDesktop.zh-Hans.resx">
+      <DependentUpon>FDesktop.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FBarcodeSettings.de.resx">
+      <DependentUpon>FBarcodeSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FBarcodeSettings.en.resx">
+      <DependentUpon>FBarcodeSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FBarcodeSettings.resx">
+      <DependentUpon>FBarcodeSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FDocumentsSettings.de.resx">
+      <DependentUpon>FDocumentsSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FDocumentsSettings.en.resx">
+      <DependentUpon>FDocumentsSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FDocumentsSettings.resx">
+      <DependentUpon>FDocumentsSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FEditProfile.aa-DJ.resx">
+      <DependentUpon>FEditProfile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FEditProfile.en.resx">
+      <DependentUpon>FEditProfile.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="WinForms\FProxyConfig.af.resx" Condition="'$(Configuration)' != 'Debug'">
       <DependentUpon>FProxyConfig.cs</DependentUpon>
     </EmbeddedResource>
@@ -883,6 +992,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="WinForms\FProxyConfig.zh-TW.resx" Condition="'$(Configuration)' != 'Debug'">
       <DependentUpon>FProxyConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FSqueezeSettings.de.resx">
+      <DependentUpon>FSqueezeSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FSqueezeSettings.en.resx">
+      <DependentUpon>FSqueezeSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\FSqueezeSettings.resx">
+      <DependentUpon>FSqueezeSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WinForms\ImageForm.af.resx">
       <DependentUpon>ImageForm.cs</DependentUpon>
@@ -6132,34 +6250,52 @@
     <None Include="Lang\po\zh-CHS.po" />
     <None Include="Lang\po\zh-TW.po" />
     <None Include="naps2-public.cer" />
+    <None Include="Icons\accept-small-white.png" />
     <None Include="packages.config" />
-    <None Include="Icons\accept-small.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Icons\accept.png" />
+    <None Include="Icons\accept-white.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Icons\add-small.png" />
+    <None Include="Icons\add-small-white.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Icons\add.png" />
+    <None Include="Icons\add-white.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Icons\arrow_down.png" />
+    <None Include="Icons\arrow_down-white.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Icons\arrow_out.png" />
+    <None Include="Icons\arrow_out-white.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Icons\arrow_up.png" />
+    <None Include="Icons\arrow_up-white.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Icons\world-small.png" />
+    <None Include="Icons\zoom_out-white.png" />
+    <None Include="Icons\zoom_in-white.png" />
+    <None Include="Icons\world-white.png" />
+    <None Include="Icons\text-white.png" />
+    <None Include="Icons\folder_picture-white.png" />
+    <None Include="Icons\file_extension_pdf-white.png" />
+    <None Include="Icons\pictures-white.png" />
+    <None Include="Icons\mail_attachment-white.png" />
+    <None Include="Icons\printer-white.png" />
+    <None Include="Icons\pencil-white.png" />
+    <None Include="Icons\information-white.png" />
+    <Content Include="1.ico" />
+    <Content Include="Icons\1.ico" />
+    <None Include="Icons\inbox_out-white.png" />
+    <None Include="Icons\gearwheels-white.png" />
+    <None Include="Icons\text-small.png" />
+    <Content Include="Icons\barcode-white.png" />
     <Content Include="Icons\wireless16.png" />
     <None Include="Icons\btn_donate_LG.gif" />
     <None Include="Icons\application_cascade.png" />
     <Content Include="Icons\application_cascade.ico" />
-    <Content Include="Icons\arrow_left.png" />
-    <Content Include="Icons\arrow_right.png" />
+    <Content Include="Icons\arrow_left-white.png" />
+    <Content Include="Icons\arrow_right-white.png" />
     <Content Include="Icons\arrow_rotate_anticlockwise-small.ico" />
     <Content Include="Icons\close.png" />
     <None Include="Icons\color_gradient.png" />
@@ -6169,13 +6305,13 @@
     <Content Include="Icons\color_wheel.png" />
     <Content Include="Icons\contrast.ico" />
     <Content Include="Icons\contrast.png" />
-    <Content Include="Icons\arrow_down-small.png" />
-    <Content Include="Icons\arrow_up-small.png" />
+    <Content Include="Icons\arrow_down-small-white.png" />
+    <Content Include="Icons\arrow_up-small-white.png" />
     <None Include="Icons\contrast_with_sun.png" />
     <None Include="Icons\contrast_high.png" />
     <Content Include="Icons\contrast_high.ico" />
     <Content Include="Icons\contrast_with_sun.ico" />
-    <Content Include="Icons\control_play_blue-small.png" />
+    <Content Include="Icons\control_play_blue-small-white.png" />
     <Content Include="Icons\email.ico" />
     <None Include="Icons\email_setting.png" />
     <Content Include="Icons\file_extension_pdf.ico" />
@@ -6183,7 +6319,7 @@
     <None Include="Icons\hourglass_grey.png" />
     <Content Include="Icons\image_edit.png" />
     <None Include="Icons\outlookweb.png" />
-    <None Include="Icons\mail_yellow.png" />
+    <None Include="Icons\mail-white.png" />
     <Content Include="Icons\key.ico" />
     <Content Include="Icons\picture.ico" />
     <Content Include="Icons\pictures.png" />
@@ -6201,13 +6337,13 @@
     <Content Include="Icons\transform_crop.png" />
     <Content Include="Icons\weather_sun.ico" />
     <Content Include="Icons\weather_sun.png" />
-    <None Include="Icons\arrow_rotate_anticlockwise.png" />
-    <None Include="Icons\arrow_rotate_clockwise.png" />
-    <None Include="Icons\arrow_switch.png" />
-    <None Include="Icons\arrow_rotate_anticlockwise-small.png" />
-    <None Include="Icons\arrow_rotate_clockwise-small.png" />
-    <None Include="Icons\arrow_switch-small.png" />
-    <None Include="Icons\arrow_refresh.png" />
+    <None Include="Icons\arrow_rotate_anticlockwise-white.png" />
+    <None Include="Icons\arrow_rotate_clockwise-white.png" />
+    <None Include="Icons\arrow_switch-white.png" />
+    <None Include="Icons\arrow_rotate_anticlockwise-small-white.png" />
+    <None Include="Icons\arrow_rotate_clockwise-small-white.png" />
+    <None Include="Icons\arrow_switch-small-white.png" />
+    <None Include="Icons\arrow_refresh-white.png" />
     <Content Include="Icons\blueprints-small.ico" />
     <Content Include="Icons\folder_picture.png" />
     <Content Include="Icons\information-small.ico" />
@@ -6216,7 +6352,7 @@
     <Content Include="Icons\scanner-large.png" />
     <Content Include="Icons\scanner.ico" />
     <Content Include="Icons\scanner.png" />
-    <None Include="Icons\control_play_blue.png" />
+    <None Include="Icons\control_play_blue-white.png" />
     <None Include="Icons\zoom_out.png" />
     <None Include="Icons\zoom_in.png" />
     <None Include="Icons\zoom_actual.png" />
@@ -6235,21 +6371,15 @@
     <None Include="Icons\info_rhombus.png" />
     <None Include="Icons\file_extension_pdf.png" />
     <None Include="Icons\email_attach.png" />
-    <None Include="Icons\cross.png" />
-    <None Include="Icons\cross-small.png" />
-    <None Include="Icons\cancel.png" />
-    <None Include="Icons\cancel-small.png" />
-    <None Include="Icons\blueprints.png" />
+    <None Include="Icons\cross-white.png" />
+    <None Include="Icons\cross-small-white.png" />
+    <None Include="Icons\cancel-white.png" />
+    <None Include="Icons\cancel-small-white.png" />
+    <None Include="Icons\blueprints-white.png" />
     <None Include="Icons\blueprints-small.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
-  </Target>
   <PropertyGroup>
     <PreBuildEvent Condition="'$(OS)' == 'Windows_NT'">If Not Exist $(ProjectDir)google.credentials.json (
 echo {} &gt; $(ProjectDir)google.credentials.json
@@ -6258,11 +6388,6 @@ If Not Exist $(ProjectDir)microsoft.credentials.json (
 echo { client_id: null, client_secret: null } &gt; $(ProjectDir)microsoft.credentials.json
 )</PreBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
-  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
-    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
-    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -6271,4 +6396,9 @@ echo { client_id: null, client_secret: null } &gt; $(ProjectDir)microsoft.creden
   </Target>
   -->
   <Import Project="..\NAPS2\Setup\CommonTargets.targets" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
 </Project>

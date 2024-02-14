@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NAPS2.Barcode;
 using NAPS2.Util;
 
 namespace NAPS2.ImportExport
@@ -15,6 +16,10 @@ namespace NAPS2.ImportExport
         public Slice Slice { get; set; }
 
         public bool DetectPatchCodes { get; set; }
+
+        public BarcodeDetectionMode DetectBarcodes { get; set; }
+
+        public BarcodeParams BarcodeParams { get; set; }
 
         public bool NoThumbnails { get; set; }
     }

@@ -40,6 +40,13 @@ namespace NAPS2.Config
                 }
                 return config;
             }
+            set
+            {
+                lock(this)
+                {
+                    config = value;
+                }
+            }
         }
 
         public virtual void Load()

@@ -7,12 +7,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NAPS2 (Not Another PDF Scanner 2)")]
+[assembly: AssemblyTitle("Squeeze Scanner")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("NAPS2 (Not Another PDF Scanner 2)")]
-[assembly: AssemblyCopyright("Copyright 2009, 2012-2018 NAPS2 Contributors; Icons from http://www.fatcow.com/free-icons")]
+[assembly: AssemblyCompany("DEXPRO Solutions GmbH")]
+[assembly: AssemblyProduct("Squeeze Scanner")]
+[assembly: AssemblyCopyright("Copyright 2020 DEXPRO Solutions GmbH; Copyright 2018-2019 otris software AG; Copyright 2009, 2012-2018 NAPS2 Contributors; Icons from http://www.fatcow.com/free-icons")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

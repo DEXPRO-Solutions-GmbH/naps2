@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using NAPS2.Barcode;
 using NAPS2.Recovery;
 using NAPS2.Scan.Images.Transforms;
 using NAPS2.Util;
@@ -36,12 +37,12 @@ namespace NAPS2.Scan.Images
             return new ScannedImage(pdfPath, copy);
         }
 
-        public ScannedImage(Bitmap img, ScanBitDepth bitDepth, bool highQuality, int quality)
+        public ScannedImage(Bitmap img, ScanBitDepth bitDepth, bool highQuality, int quality, BarcodeResult[] barcodes = null, PatchCode patchCode = PatchCode.None)
         {
             string tempFilePath = ScannedImageHelper.SaveSmallestBitmap(img, bitDepth, highQuality, quality, out ImageFormat fileFormat);
 
             transformList = new List<Transform>();
-            recoveryImage = RecoveryImage.CreateNew(fileFormat, bitDepth, highQuality, transformList);
+            recoveryImage = RecoveryImage.CreateNew(fileFormat, bitDepth, highQuality, transformList, barcodes, patchCode);
 
             File.Move(tempFilePath, recoveryImage.FilePath);
 
@@ -57,7 +58,7 @@ namespace NAPS2.Scan.Images
         private ScannedImage(string pdfPath, bool copy)
         {
             transformList = new List<Transform>();
-            recoveryImage = RecoveryImage.CreateNew(null, ScanBitDepth.C24Bit, false, transformList);
+            recoveryImage = RecoveryImage.CreateNew(null, ScanBitDepth.C24Bit, false, transformList, null, PatchCode.None);
 
             if (copy)
             {
@@ -70,8 +71,26 @@ namespace NAPS2.Scan.Images
 
             recoveryImage.Save();
         }
+        
+        public PatchCode PatchCode
+        {
+            get => recoveryImage.IndexImage.PatchCode;
+            set
+            {
+                recoveryImage.IndexImage.PatchCode = value;
+                recoveryImage.Save();
+            }
+        }
 
-        public PatchCode PatchCode { get; set; }
+        public BarcodeResult[] Barcodes
+        {
+            get => recoveryImage.IndexImage.Barcodes;
+            set
+            {
+                recoveryImage.IndexImage.Barcodes = value;
+                recoveryImage.Save();
+            }
+        }
 
         public ImageFormat FileFormat => recoveryImage.FileFormat;
 

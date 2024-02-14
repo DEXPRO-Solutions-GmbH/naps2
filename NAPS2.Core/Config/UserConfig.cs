@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using NAPS2.Barcode;
+using NAPS2.ImportExport.Documents;
 using NAPS2.ImportExport.Email;
 using NAPS2.ImportExport.Images;
 using NAPS2.ImportExport.Pdf;
+using NAPS2.ImportExport.Squeeze;
 using NAPS2.Ocr;
 using NAPS2.Scan;
 using NAPS2.Scan.Batch;
@@ -47,6 +50,12 @@ namespace NAPS2.Config
         public ImageSettings ImageSettings { get; set; }
 
         public EmailSettings EmailSettings { get; set; }
+
+        public DocumentsSettings DocumentsSettings { get; set; }
+
+        public SqueezeSettings SqueezeSettings { get; set; }
+
+        public BarcodeParams BarcodeParams { get; set; }
 
         public EmailSetup EmailSetup { get; set; }
 

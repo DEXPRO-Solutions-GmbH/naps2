@@ -3,6 +3,8 @@
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
   <Fragment Id='LanguageComponentsFragment'>
     <ComponentGroup Id="LangComponents">
+      <ComponentRef Id="LangComponent_aa" />
+      <ComponentRef Id="LangComponent_aa_DJ" />
       <ComponentRef Id="LangComponent_af" />
       <ComponentRef Id="LangComponent_ar" />
       <ComponentRef Id="LangComponent_bg" />
@@ -11,6 +13,7 @@
       <ComponentRef Id="LangComponent_da" />
       <ComponentRef Id="LangComponent_de" />
       <ComponentRef Id="LangComponent_el" />
+      <ComponentRef Id="LangComponent_en" />
       <ComponentRef Id="LangComponent_es" />
       <ComponentRef Id="LangComponent_et" />
       <ComponentRef Id="LangComponent_fa" />
@@ -43,10 +46,21 @@
       <ComponentRef Id="LangComponent_uk" />
       <ComponentRef Id="LangComponent_vi" />
       <ComponentRef Id="LangComponent_zh_CHS" />
+      <ComponentRef Id="LangComponent_zh_Hans" />
       <ComponentRef Id="LangComponent_zh_TW" />
     </ComponentGroup>
 
     <DirectoryRef Id="LIBFOLDER">
+      <Directory Id="LangFolder_aa" Name="aa">
+        <Component Id="LangComponent_aa">
+          <File Source="..\NAPS2\bin\InstallerMSI\aa\NAPS2.Core.resources.dll" Id="LangFile_aa" />
+        </Component>
+      </Directory>
+      <Directory Id="LangFolder_aa_DJ" Name="aa-DJ">
+        <Component Id="LangComponent_aa_DJ">
+          <File Source="..\NAPS2\bin\InstallerMSI\aa-DJ\NAPS2.Core.resources.dll" Id="LangFile_aa_DJ" />
+        </Component>
+      </Directory>
       <Directory Id="LangFolder_af" Name="af">
         <Component Id="LangComponent_af">
           <File Source="..\NAPS2\bin\InstallerMSI\af\NAPS2.Core.resources.dll" Id="LangFile_af" />
@@ -85,6 +99,11 @@
       <Directory Id="LangFolder_el" Name="el">
         <Component Id="LangComponent_el">
           <File Source="..\NAPS2\bin\InstallerMSI\el\NAPS2.Core.resources.dll" Id="LangFile_el" />
+        </Component>
+      </Directory>
+      <Directory Id="LangFolder_en" Name="en">
+        <Component Id="LangComponent_en">
+          <File Source="..\NAPS2\bin\InstallerMSI\en\NAPS2.Core.resources.dll" Id="LangFile_en" />
         </Component>
       </Directory>
       <Directory Id="LangFolder_es" Name="es">
@@ -245,6 +264,11 @@
       <Directory Id="LangFolder_zh_CHS" Name="zh-CHS">
         <Component Id="LangComponent_zh_CHS">
           <File Source="..\NAPS2\bin\InstallerMSI\zh-CHS\NAPS2.Core.resources.dll" Id="LangFile_zh_CHS" />
+        </Component>
+      </Directory>
+      <Directory Id="LangFolder_zh_Hans" Name="zh-Hans">
+        <Component Id="LangComponent_zh_Hans">
+          <File Source="..\NAPS2\bin\InstallerMSI\zh-Hans\NAPS2.Core.resources.dll" Id="LangFile_zh_Hans" />
         </Component>
       </Directory>
       <Directory Id="LangFolder_zh_TW" Name="zh-TW">

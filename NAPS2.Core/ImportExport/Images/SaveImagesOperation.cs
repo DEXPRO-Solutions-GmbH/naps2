@@ -59,12 +59,12 @@ namespace NAPS2.ImportExport.Images
             {
                 try
                 {
-                    var subFileName = fileNamePlaceholders.SubstitutePlaceholders(fileName, dateTime, batch);
+                    var subFileName = fileNamePlaceholders.SubstitutePlaceholders(fileName, dateTime, batch, barcode: images.FirstOrDefault()?.Barcodes?.FirstOrDefault()?.Text);
                     if (Directory.Exists(subFileName))
                     {
                         // Not supposed to be a directory, but ok...
                         fileName = Path.Combine(subFileName, "$(n).jpg");
-                        subFileName = fileNamePlaceholders.SubstitutePlaceholders(fileName, dateTime, batch);
+                        subFileName = fileNamePlaceholders.SubstitutePlaceholders(fileName, dateTime, batch, barcode: images.FirstOrDefault()?.Barcodes?.FirstOrDefault()?.Text);
                     }
                     ImageFormat format = GetImageFormat(subFileName);
 
@@ -115,7 +115,7 @@ namespace NAPS2.ImportExport.Images
                         else
                         {
                             var fileNameN = fileNamePlaceholders.SubstitutePlaceholders(fileName, dateTime, true, i,
-                                digits);
+                                digits, snapshot?.Source?.Barcodes?.FirstOrDefault()?.Text);
                             Status.StatusText = string.Format(MiscResources.SavingFormat, Path.GetFileName(fileNameN));
                             InvokeStatusChanged();
                             await DoSaveImage(snapshot, fileNameN, format);

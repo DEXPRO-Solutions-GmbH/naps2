@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using NAPS2.Barcode;
 using NAPS2.Logging;
 using NAPS2.Platform;
 using NAPS2.Scan.Exceptions;
@@ -27,14 +28,16 @@ namespace NAPS2.Scan.Sane
         private readonly IFormFactory formFactory;
         private readonly IBlankDetector blankDetector;
         private readonly ScannedImageHelper scannedImageHelper;
+        private readonly BarcodeProcessor barcodeProcessor;
 
-        public SaneScanDriver(SaneWrapper saneWrapper, IFormFactory formFactory, IBlankDetector blankDetector, ScannedImageHelper scannedImageHelper)
+        public SaneScanDriver(SaneWrapper saneWrapper, IFormFactory formFactory, IBlankDetector blankDetector, ScannedImageHelper scannedImageHelper, BarcodeProcessor barcodeProcessor)
             : base(formFactory)
         {
             this.saneWrapper = saneWrapper;
             this.formFactory = formFactory;
             this.blankDetector = blankDetector;
             this.scannedImageHelper = scannedImageHelper;
+            this.barcodeProcessor = barcodeProcessor;
         }
 
         public override string DriverName => DRIVER_NAME;
@@ -267,6 +270,13 @@ namespace NAPS2.Scan.Sane
                     {
                         var image = new ScannedImage(encoded, ScanProfile.BitDepth, ScanProfile.MaxQuality, ScanProfile.Quality);
                         scannedImageHelper.PostProcessStep2(image, result, ScanProfile, ScanParams, 1, false);
+
+                        if (barcodeProcessor.ProcessPage(image, ScanParams.DetectBarcodes.SelectHighest(ScanProfile.DetectBarcodes), result, ScanParams.BarcodeParams))
+                        {
+                            image.Dispose();
+                            return (null, false);
+                        }
+
                         string tempPath = scannedImageHelper.SaveForBackgroundOcr(result, ScanParams);
                         scannedImageHelper.RunBackgroundOcr(image, ScanParams, tempPath);
                         return (image, false);

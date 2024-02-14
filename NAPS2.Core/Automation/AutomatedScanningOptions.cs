@@ -5,6 +5,7 @@ using CommandLine;
 
 namespace NAPS2.Automation
 {
+    [Serializable]
     public class AutomatedScanningOptions : CommandLineOptions
     {
         #region General Options
@@ -21,19 +22,16 @@ namespace NAPS2.Automation
         [Option("install", HelpText = "Use this option to download and install optional components (e.g. \"ocr-eng\", \"generic-import\").")]
         public string Install { get; set; }
 
+        [Option("serviceinstall", HelpText = "Use this option to install the current command line as a service")]
+        public bool ServiceInstall { get; set; }
+
+        [Option("serviceuninstall", HelpText = "Use this option to uninstall the service")]
+        public bool ServiceUninstall { get; set; }
+
         [Option('p', "profile", HelpText = "The name of the profile to use for scanning." +
                                            " If not specified, the most-recently-used profile from the GUI is selected.")]
         public string ProfileName { get; set; }
 
-        [Option('i', "import", HelpText = "The name and path of one or more pdf/image files to import." +
-                                          " Imported files are prepended to the output in the order they are specified." +
-                                          " Multiple files are separated by a semicolon (\";\")." +
-                                          " Slice notation can be used to only import some pages (e.g. \"[0]\" for the first page or \"[:2]\" for the first two pages).")]
-        public string ImportPath { get; set; }
-
-        [Option("importpassword", HelpText = "The password to use to import one or more encrypted PDF files.")]
-        public string ImportPassword { get; set; }
-        
         [Option("progress", HelpText = "Display a graphical window for scanning progress.")]
         public bool Progress { get; set; }
 
@@ -44,8 +42,8 @@ namespace NAPS2.Automation
         [Option('n', "number", DefaultValue = 1, HelpText = "The number of scans to perform.")]
         public int Number { get; set; }
 
-        [Option('d', "delay", DefaultValue = 0, HelpText = "The delay (in milliseconds) between each scan.")]
-        public int Delay { get; set; }
+        [Option('d', "delay", DefaultValue = -1, HelpText = "The delay (in milliseconds) between each scan. Also controls the --continuous delay")]
+        public int Delay { get; set; } = -1;
 
         [Option('f', "force", HelpText = "Overwrite existing files." +
                                          " If not specified, any files that already exist will not be changed.")]
@@ -53,6 +51,48 @@ namespace NAPS2.Automation
 
         [Option('w', "wait", HelpText = "After finishing, wait for user input (enter/return) before exiting.")]
         public bool WaitForEnter { get; set; }
+
+        [Option('c', "continuous", HelpText = "Repeats this command forever")]
+        public bool ContinuousMode { get; set; }
+
+        #endregion
+
+        #region Folder Processing
+
+        [Option('F', "processfolder", HelpText = "Recursivly find all files in a folder and import and process them seperatly." +
+                                                 " To merge all the files in the folder and process them at once specify --mergefolder too.")]
+        public string FolderPath { get; set; }
+
+        [Option('M', "mergefolder", HelpText = "Import all the files in the folder at once")]
+        public bool MergeFolder { get; set; }
+
+        [Option('P', "filepattern", HelpText = "Pattern to filter the files in a folder. Supports * and ? as placeholders.")]
+        public string FilePattern { get; set; }
+
+        #endregion
+
+        #region Import Options
+
+        [Option('i', "import", HelpText = "The name and path of one or more pdf/image files to import." +
+                                          " Imported files are prepended to the output in the order they are specified." +
+                                          " Multiple files are separated by a semicolon (\";\")." +
+                                          " Slice notation can be used to only import some pages (e.g. \"[0]\" for the first page or \"[:2]\" for the first two pages).")]
+        public string ImportPath { get; set; }
+
+        [Option("importpassword", HelpText = "The password to use to import one or more encrypted PDF files.")]
+        public string ImportPassword { get; set; }
+
+        [Option("successdelete", HelpText = "Delete files that were processed successfully")]
+        public bool SuccessDelete { get; set; }
+
+        [Option("successmove", HelpText = "Move files that were processed successfully to this directory")]
+        public string SuccessMove { get; set; }
+
+        [Option("errordelete", HelpText = "Delete files that caused an error")]
+        public bool ErrorDelete { get; set; }
+
+        [Option("errormove", HelpText = "Move files that caused an error to this directory")]
+        public string ErrorMove { get; set; }
 
         #endregion
 
@@ -85,6 +125,12 @@ namespace NAPS2.Automation
 
         [Option("splitpatcht", HelpText = "Split the pages into multiple PDF/TIFF files, separating by Patch-T.")]
         public bool SplitPatchT { get; set; }
+
+        [Option("splitbarcode", HelpText = "Split the pages into multiple PDF/TIFF files, separating by barcodes on the first pages.")]
+        public bool SplitBarcode { get; set; }
+
+        [Option("removebarcodepage", HelpText = "Removes the page which contains the barcode and moves the barcode result to the next page.")]
+        public bool RemoveBarcodePage { get; set; }
 
         [Option("splitsize", HelpText = "Split the pages into multiple PDF/TIFF files with the given number of pages per file.")]
         public int SplitSize { get; set; }
@@ -182,7 +228,36 @@ namespace NAPS2.Automation
 
         [Option("tiffcomp", HelpText = "The compression to use for TIFF files. Possible values: auto, lzw, ccitt4, none")]
         public string TiffComp { get; set; }
-        
+
+        #endregion
+
+        #region Documents Options
+
+        [Option('D', "documents", HelpText = "The name of the file to upload to documents." +
+                                         " The extension determines the output type (e.g. .pdf for a PDF file, .jpg for a JPEG).")]
+        //" You can use \"<date>\" and/or \"<time>\" to insert the date/time of the scan.")]
+        public string DocumentsFileName { get; set; }
+        /*
+        [Option("username", HelpText = "The documents username" +
+                                      //" You can use \"<date>\" and/or \"<time>\" to insert the date/time of the scan." +
+                                      " Requires -u/--documents.")]
+        public string DocumentsUserName { get; set; }
+
+        [Option("password", HelpText = "The documents password" +
+                                      //" You can use \"<date>\" and/or \"<time>\" to insert the date/time of the scan." +
+                                      " Requires -u/--documents.")]
+        public string DocumentsPassword { get; set; }
+
+        [Option("server", HelpText = "The documents server" +
+                                      //" You can use \"<date>\" and/or \"<time>\" to insert the date/time of the scan." +
+                                      " Requires -u/--documents.")]
+        public string DocumentsServer { get; set; }
+
+        [Option("pri", HelpText = "The documents principal" +
+                                      //" You can use \"<date>\" and/or \"<time>\" to insert the date/time of the scan." +
+                                      " Requires -u/--documents.")]
+        public string DocumentsPrincipal { get; set; }
+        */
         #endregion
     }
 }

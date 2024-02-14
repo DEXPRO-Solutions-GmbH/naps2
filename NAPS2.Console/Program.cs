@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NAPS2.DI.EntryPoints;
+using NAPS2.Service;
 
 namespace NAPS2.Console
 {
@@ -13,8 +14,9 @@ namespace NAPS2.Console
         [STAThread]
         static void Main(string[] args)
         {
+            var serviceExecutable = ServiceAssemblyLocator.Locate();
             // Use reflection to avoid antivirus false positives (yes, really)
-            typeof(ConsoleEntryPoint).GetMethod("Run").Invoke(null, new object[] { args });
+            typeof(ConsoleEntryPoint).GetMethod("Run").Invoke(null, new object[] { args, serviceExecutable });
         }
     }
 }

@@ -28,13 +28,13 @@ Build-NAPS2
 cp "..\..\NAPS2.Setup\bin\Release\NAPS2.Setup.msi" ($PublishDir + "naps2-$Name-setup.msi")
 
 # EXE Installer
-& (Get-Inno-Path) "setup.iss"
-if (-not [string]::IsNullOrEmpty($Name)) {
-	if ($Force -and (Test-Path ($PublishDir + "naps2-$Name-setup.exe")) -and (-not ($Name -eq $Version))) {
-		Remove-Item ($PublishDir + "naps2-$Name-setup.exe")
-	}
-	ren ($PublishDir + "naps2-$Version-setup.exe") "naps2-$Name-setup.exe"
-}
+# & (Get-Inno-Path) "setup.iss"
+# if (-not [string]::IsNullOrEmpty($Name)) {
+# 	if ($Force -and (Test-Path ($PublishDir + "naps2-$Name-setup.exe")) -and (-not ($Name -eq $Version))) {
+# 		Remove-Item ($PublishDir + "naps2-$Name-setup.exe")
+# 	}
+# 	ren ($PublishDir + "naps2-$Version-setup.exe") "naps2-$Name-setup.exe"
+# }
 
 # Standalone ZIP/7Z
 Publish-NAPS2-Standalone $PublishDir "Standalone" ($PublishDir + "naps2-$Name-portable.zip")

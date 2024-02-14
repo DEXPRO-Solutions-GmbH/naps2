@@ -1,8 +1,10 @@
 ﻿function Get-MSBuild-Path {
+    # This should be $env:MSBUILD_PATH but somehow that does not work.
     "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
 }
 
 function Get-7z-Path {
+    # This should be $env:7Z_PATH but somehow that does not work.
     "C:\Program Files\7-Zip\7z.exe"
 }
 

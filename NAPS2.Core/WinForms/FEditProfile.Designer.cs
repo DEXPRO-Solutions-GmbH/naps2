@@ -72,6 +72,8 @@ namespace NAPS2.WinForms
             this.linkAutoSaveSettings = new System.Windows.Forms.LinkLabel();
             this.btnAdvanced = new System.Windows.Forms.Button();
             this.btnNetwork = new System.Windows.Forms.Button();
+            this.cbBarcodeDetection = new System.Windows.Forms.CheckBox();
+            this.cbRemoveCoverPages = new System.Windows.Forms.CheckBox();
             this.panelUI.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trBrightness)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trContrast)).BeginInit();
@@ -325,11 +327,27 @@ namespace NAPS2.WinForms
             this.btnNetwork.UseVisualStyleBackColor = true;
             this.btnNetwork.Click += new System.EventHandler(this.btnNetwork_Click);
             // 
+            // cbBarcodeDetection
+            // 
+            resources.ApplyResources(this.cbBarcodeDetection, "cbBarcodeDetection");
+            this.cbBarcodeDetection.Name = "cbBarcodeDetection";
+            this.cbBarcodeDetection.UseVisualStyleBackColor = true;
+            this.cbBarcodeDetection.CheckedChanged += new System.EventHandler(this.cbBarcodeDetection_CheckedChanged);
+            // 
+            // cbRemoveCoverPages
+            // 
+            resources.ApplyResources(this.cbRemoveCoverPages, "cbRemoveCoverPages");
+            this.cbRemoveCoverPages.Name = "cbRemoveCoverPages";
+            this.cbRemoveCoverPages.UseVisualStyleBackColor = true;
+            this.cbRemoveCoverPages.CheckedChanged += new System.EventHandler(this.cbRemoveCoverPages_CheckedChanged);
+            // 
             // FEditProfile
             // 
             this.AcceptButton = this.btnOK;
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.cbRemoveCoverPages);
+            this.Controls.Add(this.cbBarcodeDetection);
             this.Controls.Add(this.btnNetwork);
             this.Controls.Add(this.btnAdvanced);
             this.Controls.Add(this.linkAutoSaveSettings);
@@ -415,5 +433,7 @@ namespace NAPS2.WinForms
         private System.Windows.Forms.Button btnAdvanced;
         private System.Windows.Forms.RadioButton rdSANE;
         private System.Windows.Forms.Button btnNetwork;
+        private System.Windows.Forms.CheckBox cbBarcodeDetection;
+        private System.Windows.Forms.CheckBox cbRemoveCoverPages;
     }
 }

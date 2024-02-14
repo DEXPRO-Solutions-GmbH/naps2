@@ -75,7 +75,7 @@ namespace NAPS2.ImportExport.Pdf
             {
                 return true;
             }
-            if (appConfigManager.Config.NoUpdatePrompt)
+            if (appConfigManager.Config.NoExternalDownloadPrompt)
             {
                 return false;
             }

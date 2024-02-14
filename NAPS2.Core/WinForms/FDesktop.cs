@@ -14,8 +14,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using NAPS2.Barcode;
 using NAPS2.Config;
 using NAPS2.ImportExport;
+using NAPS2.ImportExport.Documents;
+using NAPS2.ImportExport.Protocol;
+using NAPS2.ImportExport.Squeeze;
 using NAPS2.Lang;
 using NAPS2.Lang.Resources;
 using NAPS2.Logging;
@@ -30,7 +34,10 @@ using NAPS2.Scan.Wia;
 using NAPS2.Scan.Wia.Native;
 using NAPS2.Update;
 using NAPS2.Util;
+using NAPS2.Util.Color;
 using NAPS2.Worker;
+using Newtonsoft.Json;
+using Binding = NAPS2.Barcode.Binding;
 
 #endregion
 
@@ -62,6 +69,10 @@ namespace NAPS2.WinForms
         private readonly IWorkerServiceFactory workerServiceFactory;
         private readonly IOperationProgress operationProgress;
         private readonly UpdateChecker updateChecker;
+        private readonly Lifecycle lifecycle;
+        private readonly ProtocolHandler protocolHandler;
+        private readonly BarcodeSettingsContainer barcodeSettingsContainer;
+        private readonly SqueezeSettingsContainer squeezeSettingsContainer;
 
         #endregion
 
@@ -72,12 +83,13 @@ namespace NAPS2.WinForms
         private bool closed = false;
         private LayoutManager layoutManager;
         private bool disableSelectedIndexChangedEvent;
+        private int selectedBinding = -1;
 
         #endregion
 
         #region Initialization and Culture
 
-        public FDesktop(StringWrapper stringWrapper, AppConfigManager appConfigManager, RecoveryManager recoveryManager, OcrManager ocrManager, IProfileManager profileManager, IScanPerformer scanPerformer, IScannedImagePrinter scannedImagePrinter, ChangeTracker changeTracker, StillImage stillImage, IOperationFactory operationFactory, IUserConfigManager userConfigManager, KeyboardShortcutManager ksm, ThumbnailRenderer thumbnailRenderer, WinFormsExportHelper exportHelper, ScannedImageRenderer scannedImageRenderer, NotificationManager notify, CultureInitializer cultureInitializer, IWorkerServiceFactory workerServiceFactory, IOperationProgress operationProgress, UpdateChecker updateChecker)
+        public FDesktop(StringWrapper stringWrapper, AppConfigManager appConfigManager, RecoveryManager recoveryManager, OcrManager ocrManager, IProfileManager profileManager, IScanPerformer scanPerformer, IScannedImagePrinter scannedImagePrinter, ChangeTracker changeTracker, StillImage stillImage, IOperationFactory operationFactory, IUserConfigManager userConfigManager, KeyboardShortcutManager ksm, ThumbnailRenderer thumbnailRenderer, WinFormsExportHelper exportHelper, ScannedImageRenderer scannedImageRenderer, NotificationManager notify, CultureInitializer cultureInitializer, IWorkerServiceFactory workerServiceFactory, IOperationProgress operationProgress, UpdateChecker updateChecker, Lifecycle lifecycle, ProtocolHandler protocolHandler, BarcodeSettingsContainer barcodeSettingsContainer, SqueezeSettingsContainer squeezeSettingsContainer)
         {
             this.stringWrapper = stringWrapper;
             this.appConfigManager = appConfigManager;
@@ -99,6 +111,10 @@ namespace NAPS2.WinForms
             this.workerServiceFactory = workerServiceFactory;
             this.operationProgress = operationProgress;
             this.updateChecker = updateChecker;
+            this.lifecycle = lifecycle;
+            this.protocolHandler = protocolHandler;
+            this.barcodeSettingsContainer = barcodeSettingsContainer;
+            this.squeezeSettingsContainer = squeezeSettingsContainer;
             InitializeComponent();
 
             notify.ParentForm = this;
@@ -117,6 +133,7 @@ namespace NAPS2.WinForms
         /// </summary>
         private void PostInitializeComponent()
         {
+            tStrip.Renderer = new DarkToolStripRenderer();
             foreach (var panel in toolStripContainer1.Controls.OfType<ToolStripPanel>())
             {
                 ToolStripPanelSetStyle.Invoke(panel, new object[] { ControlStyles.Selectable, true });
@@ -142,6 +159,23 @@ namespace NAPS2.WinForms
             if (appConfigManager.Config.HideSaveImagesButton)
             {
                 tStrip.Items.Remove(tsdSaveImages);
+            }
+            if (appConfigManager.Config.HideUploadDocumentsButton)
+            {
+                tStrip.Items.Remove(tsdUploadDocuments);
+                tsdSettings.DropDownItems.Remove(tsDocumentsSettings);
+            }
+            if (appConfigManager.Config.HideSendButton || string.IsNullOrWhiteSpace(appConfigManager.Config.SendTarget))
+            {
+                tStrip.Items.Remove(tsdSend);
+            } 
+            else
+            {
+                try
+                {
+                    var icon = Icon.ExtractAssociatedIcon(appConfigManager.Config.SendTarget);
+                    tsdSend.Image = icon.ToBitmap();
+                } catch { }
             }
             if (appConfigManager.Config.HideEmailButton)
             {
@@ -188,7 +222,7 @@ namespace NAPS2.WinForms
                 if (langCode == "en" || File.Exists(localizedResourcesPath))
                 {
                     var button = new ToolStripMenuItem(langName, null, (sender, args) => SetCulture(langCode));
-                    toolStripDropDownButton1.DropDownItems.Add(button);
+                    tsdLanguage.DropDownItems.Add(button);
                 }
             }
         }
@@ -293,6 +327,10 @@ namespace NAPS2.WinForms
         {
             UpdateToolbar();
 
+            var protocolArg = lifecycle.TryGetProtocolArg();
+            if(protocolArg != null)
+                protocolHandler.HandleProtocol(protocolArg);
+
             // Receive messages from other processes
             Pipes.StartServer(msg =>
             {
@@ -311,6 +349,11 @@ namespace NAPS2.WinForms
                         }
                         form.Activate();
                     });
+                }
+                if(msg.StartsWith(Pipes.MSG_PROTOCOLHANDLER))
+                {
+                    var protocolMsg = msg.Substring(Pipes.MSG_PROTOCOLHANDLER.Length);
+                    SafeInvoke(() => protocolHandler.HandleProtocol(protocolMsg));
                 }
             });
 
@@ -626,7 +669,12 @@ namespace NAPS2.WinForms
 
         private void DeleteThumbnails()
         {
-            thumbnailList1.DeletedImages(imageList.Images);
+            DeleteThumbnails(imageList.Images);
+        }
+
+        private void DeleteThumbnails(List<ScannedImage> images)
+        {
+            thumbnailList1.DeletedImages(images);
             UpdateToolbar();
         }
 
@@ -643,6 +691,42 @@ namespace NAPS2.WinForms
                 thumbnailList1.EnsureVisible(SelectedIndices.LastOrDefault());
                 thumbnailList1.EnsureVisible(SelectedIndices.FirstOrDefault());
             }
+        }
+
+        private async void RerenderThumbnailsAccordingToBindings()
+        {
+            var bindings = GetCurrentBindings();
+            double hue = 0;
+            double hueSteps = 360 / bindings.Count;
+            List<Task> tasks = new List<Task>();
+
+            foreach (var binding in bindings)
+            {
+                foreach (var img in binding.images)
+                {
+                    try
+                    {
+                        var color = new HslColor(hue, 100, 50, 255).ToColor();
+                        var pen = new Pen(color, 5);
+                    
+                        var task = thumbnailRenderer.RenderThumbnail(img, pen).ContinueWith(task =>
+                        {
+                            img.SetThumbnail(task.Result);
+                        });
+                        tasks.Add(task);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("Rendering bindings failed! Please re-run barcode detection.", "",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        Console.WriteLine(e);
+                    }
+                }
+
+                hue += hueSteps;
+            }
+
+            Task.WaitAll(tasks.ToArray());
         }
 
         private void ImageThumbnailChanged(object sender, EventArgs e)
@@ -666,22 +750,7 @@ namespace NAPS2.WinForms
 
         private void ImageThumbnailInvalidated(object sender, EventArgs e)
         {
-            SafeInvokeAsync(() =>
-            {
-                var image = (ScannedImage)sender;
-                lock (image)
-                {
-                    lock (imageList)
-                    {
-                        int index = imageList.Images.IndexOf(image);
-                        if (index != -1 && image.IsThumbnailDirty)
-                        {
-                            thumbnailList1.ReplaceThumbnail(index, image);
-                        }
-                    }
-                }
-                renderThumbnailsWaitHandle.Set();
-            });
+
         }
 
         #endregion
@@ -691,20 +760,20 @@ namespace NAPS2.WinForms
         private void UpdateToolbar()
         {
             // "All" dropdown items
-            tsSavePDFAll.Text = tsSaveImagesAll.Text = tsEmailPDFAll.Text = tsReverseAll.Text =
+            tsSendAll.Text = tsUploadSqueezeAll.Text = tsUploadDocumentsAll.Text = tsSavePDFAll.Text = tsSaveImagesAll.Text = tsEmailPDFAll.Text = tsReverseAll.Text =
                 string.Format(MiscResources.AllCount, imageList.Images.Count);
-            tsSavePDFAll.Enabled = tsSaveImagesAll.Enabled = tsEmailPDFAll.Enabled = tsReverseAll.Enabled =
+            tsUploadDocumentsAll.Enabled = tsUploadSqueezeAll.Enabled = tsSavePDFAll.Enabled = tsSaveImagesAll.Enabled = tsEmailPDFAll.Enabled = tsReverseAll.Enabled =
                 imageList.Images.Any();
 
             // "Selected" dropdown items
-            tsSavePDFSelected.Text = tsSaveImagesSelected.Text = tsEmailPDFSelected.Text = tsReverseSelected.Text =
+            tsSendSelected.Text = tsUploadSqueezeSelected.Text = tsUploadDocumentsSelected.Text = tsSavePDFSelected.Text = tsSaveImagesSelected.Text = tsEmailPDFSelected.Text = tsReverseSelected.Text =
                 string.Format(MiscResources.SelectedCount, SelectedIndices.Count());
-            tsSavePDFSelected.Enabled = tsSaveImagesSelected.Enabled = tsEmailPDFSelected.Enabled = tsReverseSelected.Enabled =
+            tsUploadDocumentsSelected.Enabled= tsUploadSqueezeSelected.Enabled = tsSavePDFSelected.Enabled = tsSaveImagesSelected.Enabled = tsEmailPDFSelected.Enabled = tsReverseSelected.Enabled =
                 SelectedIndices.Any();
 
             // Top-level toolbar actions
             tsdImage.Enabled = tsdRotate.Enabled = tsMove.Enabled = tsDelete.Enabled = SelectedIndices.Any();
-            tsdReorder.Enabled = tsdSavePDF.Enabled = tsdSaveImages.Enabled = tsdEmailPDF.Enabled = tsPrint.Enabled = tsClear.Enabled = imageList.Images.Any();
+            tsdReorder.Enabled = tsdSavePDF.Enabled = tsdSaveImages.Enabled = tsdEmailPDF.Enabled = tsdUploadDocuments.Enabled = tsdUploadSqueeze.Enabled = tsdSend.Enabled = tsPrint.Enabled = tsClear.Enabled = imageList.Images.Any();
 
             // Context-menu actions
             ctxView.Visible = ctxCopy.Visible = ctxDelete.Visible = ctxSeparator1.Visible = ctxSeparator2.Visible = SelectedIndices.Any();
@@ -943,7 +1012,7 @@ namespace NAPS2.WinForms
 
         private async void SavePDF(List<ScannedImage> images)
         {
-            if (await exportHelper.SavePDF(images, notify))
+            if (await exportHelper.SavePdf(images, notify))
             {
                 if (appConfigManager.Config.DeleteAfterSaving)
                 {
@@ -971,6 +1040,188 @@ namespace NAPS2.WinForms
         private async void EmailPDF(List<ScannedImage> images)
         {
             await exportHelper.EmailPDF(images);
+        }
+
+        private async void SendPDF(List<ScannedImage> images)
+        {
+            if (await exportHelper.SendPDF(images))
+            {
+                if (appConfigManager.Config.DeleteAfterSaving)
+                {
+                    imageList.Delete(imageList.Images.IndiciesOf(images));
+                    DeleteThumbnails();
+                }
+            }
+        }
+
+        [Obsolete("Please use UploadPDFToDocuments or UploadPDFToSqueeze directly")]
+        private Task UploadPdf(List<ScannedImage> images, bool documents, bool squeeze)
+        {
+            if (documents)
+            {
+                return UploadPdfToDocuments(images);
+            }
+
+            if (squeeze)
+            {
+                return UploadPdfToSqueeze(images, null);
+            }
+
+            throw new Exception("Upload to PDF called without specify if upload to squeeze or documents should happen!");
+        }
+
+        private async Task UploadPdfToDocuments(List<ScannedImage> images)
+        {
+            if (await exportHelper.UploadPDFToDocuments(images))
+            {
+                if (appConfigManager.Config.DeleteAfterSaving)
+                {
+                    imageList.Delete(imageList.Images.IndiciesOf(images));
+                    DeleteThumbnails();
+                }
+            }
+        }
+
+        public async Task UploadPdfToSqueeze(List<ScannedImage> images, Dictionary<string, string> fields)
+        {
+            if (await exportHelper.UploadPDFToSqueeze(images, fields))
+            {
+                if (appConfigManager.Config.DeleteAfterSaving)
+                {
+                    imageList.Delete(imageList.Images.IndiciesOf(images));
+                    DeleteThumbnails();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Uploads bindings (if present) to squeeze. Uploaded images are removed from the scan program.
+        /// This is so that users won't upload already uploaded files again.
+        /// </summary>
+        private async void UploadBindingsToSqueeze()
+        {
+            var settings = squeezeSettingsContainer.SqueezeSettings;
+            
+            // Iterate over bindings
+
+            var bindings = GetCurrentBindings();
+
+            if (bindings.Count == 0)
+            {
+                MessageBox.Show("No barcodes have been detected yet. Nothing will be uploaded.", "", MessageBoxButtons.OK, MessageBoxIcon.Information); // todo: localize
+                return;
+            }
+
+            var exceptions = new List<Exception>();
+            
+            foreach (var binding in bindings)
+            {
+                var images = binding.images;
+
+                try
+                {
+                    Dictionary<string, string> fields = new Dictionary<string, string>();
+
+                    // If the binding has a barcode, add it as document field
+                    if (binding.barcode != null && settings.BarcodeFieldName != null && settings.BarcodeFieldName != "")
+                    {
+                        fields.Add(settings.BarcodeFieldName, binding.barcode.Text);                        
+                    } 
+                    
+                    await UploadPdfToSqueeze(images, fields);
+                }
+                catch (Exception e)
+                {
+                    exceptions.Add(e);
+                    Console.WriteLine(e);
+                }
+            }
+
+            if (exceptions.Count > 0)
+            {
+                MessageBox.Show("Upload of one or more bindings failed!", "", MessageBoxButtons.OK, MessageBoxIcon.Error); // todo: localize
+            }
+        }
+        
+        /// <summary>
+        /// Returns a list of bindings that may have been found by barcode separation.
+        ///
+        /// f none of the images contain any barcodes, this will return 0 bindings.
+        /// </summary>
+        /// <returns></returns>
+        private List<Binding> GetCurrentBindings()
+        {
+            var bindings = new List<Binding>();
+
+            if (imageList.Images.Count > 0)
+            {
+                // Start of the binding that will be constructed next
+                var start = 0;
+                
+                // Iterate over all images
+                for (var imgIndex = 0; imgIndex < imageList.Images.Count; imgIndex++)
+                {
+                    var isLastImage = imgIndex == imageList.Images.Count - 1;
+
+                    var img = imageList.Images[imgIndex];
+
+                    var containsBarcode = img.Barcodes?.Length > 0;
+                    
+                    if (containsBarcode)
+                    {
+                        // This image contains a barcode and is therefore part of the next binding
+                        // Create a binding up until this (and without) this image
+
+                        var count = imgIndex - start;
+
+                        // Ignore bindings with 0 pages (could occur if first image contains barcode)
+                        if (count > 0)
+                        {
+                            // Check if the first page of this binding at least one barcode
+                            // If so, the first barcode is set as the bindings barcode
+                            BarcodeResult firstBarcode = null;
+                            if (imageList.Images[start].Barcodes.Length > 0)
+                            {
+                                firstBarcode = imageList.Images[start].Barcodes[0];
+                            }
+                            
+                            var images = imageList.Images.GetRange(start, count);
+                            var binding = new Binding(images, start, firstBarcode);
+                            bindings.Add(binding);
+                        }
+
+                        start = imgIndex;
+                    }
+
+                    if (isLastImage)
+                    {
+                        if (containsBarcode)
+                        {
+                            // Last image contains a barcode => Create a binding for only this image
+                            var images = imageList.Images.GetRange(imgIndex, 1);
+                            var binding = new Binding(images, imgIndex, img.Barcodes[0]);
+                            bindings.Add(binding);
+                        }
+                        else
+                        {
+                            // Last image is part of a previous binding => Create a binding that includes this image
+                            var count = imgIndex - start + 1;
+                            var images = imageList.Images.GetRange(start, count);
+                            BarcodeResult firstBarcode = null;
+                    
+                            if (images[0].Barcodes.Length > 0)
+                            {
+                                firstBarcode = images[0].Barcodes[0];
+                            }
+                        
+                            var binding = new Binding(images, start, firstBarcode);
+                            bindings.Add(binding);
+                        }
+                    }
+                }
+            }
+
+            return bindings;
         }
 
         private void Import()
@@ -1089,6 +1340,17 @@ namespace NAPS2.WinForms
             ksm.Assign(ks.SaveImages, tsdSaveImages);
             ksm.Assign(ks.SaveImagesAll, tsSaveImagesAll);
             ksm.Assign(ks.SaveImagesSelected, tsSaveImagesSelected);
+            ksm.Assign(ks.UploadDocuments, tsdUploadDocuments);
+            ksm.Assign(ks.UploadDocumentsAll, tsUploadDocumentsAll);
+            ksm.Assign(ks.UploadDocumentsSelected, tsUploadDocumentsSelected);
+            ksm.Assign(ks.UploadSqueeze, tsdUploadSqueeze);
+            ksm.Assign(ks.UploadSqueezeAll, tsUploadSqueezeAll);
+            ksm.Assign(ks.UploadSqueezeSelected, tsUploadSqueezeSelected);
+            ksm.Assign(ks.Send, tsdSend);
+            ksm.Assign(ks.SendAll, tsSendAll);
+            ksm.Assign(ks.SendSelected, tsSendSelected);
+            ksm.Assign(ks.BindDocuments, tsdSelectBatch);
+            ksm.Assign(ks.DetectBarcodes, tsDetectBarcodes);
             ksm.Assign(ks.SavePDF, tsdSavePDF);
             ksm.Assign(ks.SavePDFAll, tsSavePDFAll);
             ksm.Assign(ks.SavePDFSelected, tsSavePDFSelected);
@@ -1190,6 +1452,41 @@ namespace NAPS2.WinForms
 
         #region Event Handlers - Toolbar
 
+        private void tsDetectBarcodes_Click(object sender, EventArgs e)
+        {
+            var op = operationFactory.Create<BarcodeDetectOperation>();
+
+            // Setup re-rendering of thumbnails after barcode detection
+            op.Finished += (o, args) => { RerenderThumbnailsAccordingToBindings(); };
+
+            if (op.Start(imageList.Images, barcodeSettingsContainer.BarcodeParams))
+            {
+                operationProgress.ShowProgress(op);
+            }
+        }
+
+        private void tsdSelectBatch_ButtonClick(object sender, EventArgs e)
+        {
+            if (imageList.Images.Count > 0)
+            {
+                var bindings = GetCurrentBindings();
+                
+                if (bindings.Count == 0)
+                {
+                    SelectedIndices = Enumerable.Range(0, imageList.Images.Count);
+                    return;
+                }
+
+                selectedBinding++;
+                if (selectedBinding >= bindings.Count)
+                {
+                    selectedBinding = 0;
+                }
+
+                SelectedIndices = bindings[selectedBinding].Range();
+            }
+        }
+
         private async void tsScan_ButtonClick(object sender, EventArgs e)
         {
             await ScanDefault();
@@ -1211,6 +1508,11 @@ namespace NAPS2.WinForms
         private void tsProfiles_Click(object sender, EventArgs e)
         {
             ShowProfilesForm();
+        }
+
+        private void tsBarcodeSettings_Click(object sender, EventArgs e)
+        {
+            FormFactory.Create<FBarcodeSettings>().ShowDialog();
         }
 
         private void tsOcr_Click(object sender, EventArgs e)
@@ -1335,6 +1637,80 @@ namespace NAPS2.WinForms
             }
         }
 
+        private void tsdSend_ButtonClick(object sender, EventArgs e)
+        {
+            if (appConfigManager.Config.HideSendButton || string.IsNullOrWhiteSpace(appConfigManager.Config.SendTarget))
+            {
+                return;
+            }
+
+            var action = appConfigManager.Config.SaveButtonDefaultAction;
+
+            if (action == SaveButtonDefaultAction.AlwaysPrompt
+                || action == SaveButtonDefaultAction.PromptIfSelected && SelectedIndices.Any())
+            {
+                tsdSend.ShowDropDown();
+            }
+            else if (action == SaveButtonDefaultAction.SaveSelected && SelectedIndices.Any())
+            {
+                SendPDF(SelectedImages.ToList());
+            }
+            else
+            {
+                SendPDF(imageList.Images);
+            }
+        }
+
+        private void tsdUploadDocuments_ButtonClick(object sender, EventArgs e)
+        {
+            if (appConfigManager.Config.HideUploadDocumentsButton)
+            {
+                return;
+            }
+
+            var action = appConfigManager.Config.SaveButtonDefaultAction;
+
+            if (action == SaveButtonDefaultAction.AlwaysPrompt
+                || action == SaveButtonDefaultAction.PromptIfSelected && SelectedIndices.Any())
+            {
+                tsdUploadDocuments.ShowDropDown();
+            }
+            else if (action == SaveButtonDefaultAction.SaveSelected && SelectedIndices.Any())
+            {
+                UploadPdf(SelectedImages.ToList(), true, false);
+            }
+            else
+            {
+                UploadPdf(imageList.Images, true, false);
+            }
+        }
+
+        private void tsdUploadSqueeze_ButtonClick(object sender, EventArgs e)
+        {
+            /*
+            if (appConfigManager.Config.HideUploadDocumentsButton)
+            {
+                return;
+            }
+            */
+
+            var action = appConfigManager.Config.SaveButtonDefaultAction;
+
+            if (action == SaveButtonDefaultAction.AlwaysPrompt
+                || action == SaveButtonDefaultAction.PromptIfSelected && SelectedIndices.Any())
+            {
+                tsdUploadSqueeze.ShowDropDown();
+            }
+            else if (action == SaveButtonDefaultAction.SaveSelected && SelectedIndices.Any())
+            {
+                UploadPdf(SelectedImages.ToList(), false, true);
+            }
+            else
+            {
+                UploadPdf(imageList.Images, false, true);
+            }
+        }
+
         private async void tsPrint_Click(object sender, EventArgs e)
         {
             if (appConfigManager.Config.HidePrintButton)
@@ -1428,6 +1804,16 @@ namespace NAPS2.WinForms
             FormFactory.Create<FImageSettings>().ShowDialog();
         }
 
+        private void tsDocumentsSettings_Click(object sender, EventArgs e)
+        {
+            FormFactory.Create<FDocumentsSettings>().ShowDialog();
+        }
+
+        private void tsSqueezeSettings_Click(object sender, EventArgs e)
+        {
+            FormFactory.Create<FSqueezeSettings>().ShowDialog();
+        }
+
         private void tsEmailPDFAll_Click(object sender, EventArgs e)
         {
             if (appConfigManager.Config.HideEmailButton)
@@ -1448,7 +1834,76 @@ namespace NAPS2.WinForms
             EmailPDF(SelectedImages.ToList());
         }
 
+        private void tsUploadDocumentsAll_Click(object sender, EventArgs e)
+        {
+            if (appConfigManager.Config.HideUploadDocumentsButton)
+            {
+                return;
+            }
+
+            UploadPdf(imageList.Images, false, true);
+        }
+
+        private void tsUploadSqueezeAll_Click(object sender, EventArgs e)
+        {
+            /*
+            if (appConfigManager.Config.HideUploadDocumentsButton)
+            {
+                return;
+            }
+            */
+
+            UploadPdf(imageList.Images, false, true);
+        }
+
+        private void tsUploadDocumentsSelected_Click(object sender, EventArgs e)
+        {
+            /*
+            if (appConfigManager.Config.HideUploadDocumentsButton)
+            {
+                return;
+            }
+            */
+
+            UploadPdf(SelectedImages.ToList(), false, true);
+        }
+
+        private void tsUploadSqueezeSelected_Click(object sender, EventArgs e)
+        {
+            UploadPdf(SelectedImages.ToList(), false, true);
+        }
+
+        private void tsUploadSqueezeBindings_Click(object sender, EventArgs e)
+        {
+            UploadBindingsToSqueeze();
+        }
+
+        private void tsSendAll_Click(object sender, EventArgs e)
+        {
+            if (appConfigManager.Config.HideSendButton || string.IsNullOrWhiteSpace(appConfigManager.Config.SendTarget))
+            {
+                return;
+            }
+
+            SendPDF(imageList.Images);
+        }
+
+        private void tsSendSelected_Click(object sender, EventArgs e)
+        {
+            if (appConfigManager.Config.HideSendButton || string.IsNullOrWhiteSpace(appConfigManager.Config.SendTarget))
+            {
+                return;
+            }
+
+            SendPDF(SelectedImages.ToList());
+        }
+
         private void tsPdfSettings2_Click(object sender, EventArgs e)
+        {
+            FormFactory.Create<FPdfSettings>().ShowDialog();
+        }
+
+        private void tsPdfSettings3_Click(object sender, EventArgs e)
         {
             FormFactory.Create<FPdfSettings>().ShowDialog();
         }
@@ -1833,8 +2288,8 @@ namespace NAPS2.WinForms
         private void SetThumbnailSpacing(int thumbnailSize)
         {
             thumbnailList1.Padding = new Padding(0, 20, 0, 0);
-            const int MIN_PADDING = 6;
-            const int MAX_PADDING = 66;
+            const int MIN_PADDING = 3;
+            const int MAX_PADDING = 5;
             // Linearly scale the padding with the thumbnail size
             int padding = MIN_PADDING + (MAX_PADDING - MIN_PADDING) * (thumbnailSize - ThumbnailRenderer.MIN_SIZE) / (ThumbnailRenderer.MAX_SIZE - ThumbnailRenderer.MIN_SIZE);
             int spacing = thumbnailSize + padding * 2;
@@ -2080,5 +2535,9 @@ namespace NAPS2.WinForms
         }
 
         #endregion
+
+        private void FDesktop_Load(object sender, EventArgs e)
+        {
+        }
     }
 }

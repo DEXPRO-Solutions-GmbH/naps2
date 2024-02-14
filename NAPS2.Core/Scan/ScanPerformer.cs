@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using NAPS2.Barcode;
 using NAPS2.Config;
 using NAPS2.ImportExport;
 using NAPS2.Lang.Resources;
@@ -26,8 +27,9 @@ namespace NAPS2.Scan
         private readonly AppConfigManager appConfigManager;
         private readonly IProfileManager profileManager;
         private readonly ScannedImageHelper scannedImageHelper;
+        private readonly BarcodeProcessor barcodeProcessor;
 
-        public ScanPerformer(IScanDriverFactory driverFactory, IErrorOutput errorOutput, IAutoSave autoSave, AppConfigManager appConfigManager, IProfileManager profileManager, ScannedImageHelper scannedImageHelper)
+        public ScanPerformer(IScanDriverFactory driverFactory, IErrorOutput errorOutput, IAutoSave autoSave, AppConfigManager appConfigManager, IProfileManager profileManager, ScannedImageHelper scannedImageHelper, BarcodeProcessor barcodeProcessor)
         {
             this.driverFactory = driverFactory;
             this.errorOutput = errorOutput;
@@ -35,6 +37,7 @@ namespace NAPS2.Scan
             this.appConfigManager = appConfigManager;
             this.profileManager = profileManager;
             this.scannedImageHelper = scannedImageHelper;
+            this.barcodeProcessor = barcodeProcessor;
         }
 
         public async Task PerformScan(ScanProfile scanProfile, ScanParams scanParams, IWin32Window dialogParent, ISaveNotify notify,
@@ -70,8 +73,10 @@ namespace NAPS2.Scan
                 }
 
                 // Start the scan
+                barcodeProcessor.NewBatch();
                 int imageCount = 0;
-                var source = driver.Scan().Then(img => imageCount++);
+                var source = driver.Scan();
+                source = source.Then(img => imageCount++);
 
                 bool doAutoSave = !scanParams.NoAutoSave && !appConfigManager.Config.DisableAutoSave && scanProfile.EnableAutoSave && scanProfile.AutoSaveSettings != null;
                 if (doAutoSave)

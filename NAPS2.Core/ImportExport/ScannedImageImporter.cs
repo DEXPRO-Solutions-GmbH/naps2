@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using NAPS2.Barcode;
 using NAPS2.ImportExport.Images;
 using NAPS2.ImportExport.Pdf;
 using NAPS2.Scan.Images;
@@ -23,6 +24,7 @@ namespace NAPS2.ImportExport
 
         public ScannedImageSource Import(string filePath, ImportParams importParams, ProgressHandler progressCallback, CancellationToken cancelToken)
         {
+            ScannedImageSource source;
             if (filePath == null)
             {
                 throw new ArgumentNullException(nameof(filePath));
@@ -30,10 +32,13 @@ namespace NAPS2.ImportExport
             switch (Path.GetExtension(filePath).ToLowerInvariant())
             {
                 case ".pdf":
-                    return pdfImporter.Import(filePath, importParams, progressCallback, cancelToken);
+                    source = pdfImporter.Import(filePath, importParams, progressCallback, cancelToken);
+                    break;
                 default:
-                    return imageImporter.Import(filePath, importParams, progressCallback, cancelToken);
+                    source = imageImporter.Import(filePath, importParams, progressCallback, cancelToken);
+                    break;
             }
+            return source;
         }
     }
 }

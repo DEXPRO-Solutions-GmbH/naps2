@@ -14,7 +14,7 @@ namespace NAPS2.DI.EntryPoints
     /// </summary>
     public static class ConsoleEntryPoint
     {
-        public static void Run(string[] args)
+        public static void Run(string[] args, string serviceExecutable)
         {
             // Initialize Ninject (the DI framework)
             var kernel = new StandardKernel(new CommonModule(), new ConsoleModule());
@@ -32,7 +32,7 @@ namespace NAPS2.DI.EntryPoints
             WorkerManager.Init();
 
             // Run the scan automation logic
-            var scanning = kernel.Get<AutomatedScanning>(new ConstructorArgument("options", options));
+            var scanning = kernel.Get<AutomatedScanning>(new ConstructorArgument("options", options), new ConstructorArgument("serviceExecutable", serviceExecutable));
             scanning.Execute().Wait();
         }
     }

@@ -5,22 +5,25 @@
   <StartupMessageTitle></StartupMessageTitle>
   <StartupMessageText></StartupMessageText>
   <StartupMessageIcon>Information</StartupMessageIcon>
-  <SaveButtonDefaultAction>SaveAll</SaveButtonDefaultAction>
+  <SaveButtonDefaultAction>SaveSelected</SaveButtonDefaultAction>
   <HideOcrButton>false</HideOcrButton>
   <HideImportButton>false</HideImportButton>
   <HideSavePdfButton>false</HideSavePdfButton>
   <HideSaveImagesButton>false</HideSaveImagesButton>
-  <HideEmailButton>false</HideEmailButton>
-  <HidePrintButton>false</HidePrintButton>
-  <HideDonateButton>false</HideDonateButton>
+  <HideEmailButton>true</HideEmailButton>
+  <HidePrintButton>true</HidePrintButton>
+  <HideDonateButton>true</HideDonateButton>
+  <HideUploadDocumentsButton>true</HideUploadDocumentsButton>
+  <HideSendButton>false</HideSendButton>
   <DisableAutoSave>false</DisableAutoSave>
   <LockSystemProfiles>false</LockSystemProfiles>
   <LockUnspecifiedDevices>false</LockUnspecifiedDevices>
   <NoUserProfiles>false</NoUserProfiles>
   <AlwaysRememberDevice>false</AlwaysRememberDevice>
   <DisableGenericPdfImport>false</DisableGenericPdfImport>
-  <NoUpdatePrompt>false</NoUpdatePrompt>
-  <DeleteAfterSaving>false</DeleteAfterSaving>
+  <NoUpdatePrompt>true</NoUpdatePrompt>
+  <NoExternalDownloadPrompt>false</NoExternalDownloadPrompt>
+  <DeleteAfterSaving>true</DeleteAfterSaving>
   <DisableSaveNotifications>false</DisableSaveNotifications>
   <SingleInstance>false</SingleInstance>
   <ComponentsPath></ComponentsPath>
@@ -31,6 +34,8 @@
   <OcrDefaultAfterScanning>true</OcrDefaultAfterScanning>
   <ForcePdfCompat>Default</ForcePdfCompat>
   <EventLogging>None</EventLogging>
+  <SendTarget></SendTarget>
+  <SendArguments></SendArguments>
   <DefaultProfileSettings>
     <DriverName></DriverName>
     <!--
@@ -42,7 +47,7 @@
     <UseNativeUI>false</UseNativeUI>
     <PaperSource>Glass</PaperSource>
     <BitDepth>C24Bit</BitDepth>
-    <PageSize>Letter</PageSize>
+    <PageSize>A4</PageSize>
     <!--
     <CustomPageSizeName></CustomPageSizeName>
     <CustomPageSize>
@@ -52,7 +57,7 @@
     </CustomPageSize>
     -->
     <PageAlign>Right</PageAlign>
-    <Resolution>Dpi100</Resolution>
+    <Resolution>Dpi300</Resolution>
     <AfterScanScale>OneToOne</AfterScanScale>
     <Brightness>0</Brightness>
     <Contrast>0</Contrast>
@@ -76,7 +81,7 @@
     <TwainImpl>Default</TwainImpl>
   </DefaultProfileSettings>
   <KeyboardShortcuts>
-    <ScanDefault>Ctrl+Enter</ScanDefault>
+    <ScanDefault>Ctrl+S</ScanDefault>
     <ScanProfile1>F2</ScanProfile1>
     <ScanProfile2>F3</ScanProfile2>
     <ScanProfile3>F4</ScanProfile3>
@@ -93,17 +98,22 @@
     <BatchScan>Ctrl+B</BatchScan>
     <Profiles></Profiles>
     <Ocr></Ocr>
-    <Import>Ctrl+O</Import>
-    <SavePDF>Ctrl+S</SavePDF>
+    <Import>Ctrl+I</Import>
+    <SavePDF>Ctrl+P</SavePDF>
     <SavePDFAll></SavePDFAll>
     <SavePDFSelected></SavePDFSelected>
-    <SaveImages></SaveImages>
+    <SaveImages>Ctrl+T</SaveImages>
     <SaveImagesAll></SaveImagesAll>
     <SaveImagesSelected></SaveImagesSelected>
-    <EmailPDF></EmailPDF>
+    <UploadDocuments>Ctrl+D</UploadDocuments>
+    <UploadDocumentsAll></UploadDocumentsAll>
+    <UploadDocumentsSelected></UploadDocumentsSelected>
+    <BindDocuments>Ctrl+B</BindDocuments>
+    <DetectBarcodes>Ctrl+Shift+D</DetectBarcodes>
+    <EmailPDF>Ctrl+M</EmailPDF>
     <EmailPDFAll></EmailPDFAll>
     <EmailPDFSelected></EmailPDFSelected>
-    <Print>Ctrl+P</Print>
+    <Print></Print>
     <ImageView></ImageView>
     <ImageBlackWhite></ImageBlackWhite>
     <ImageBrightness></ImageBrightness>
@@ -113,9 +123,9 @@
     <ImageSaturation></ImageSaturation>
     <ImageSharpen></ImageSharpen>
     <ImageReset></ImageReset>
-    <RotateLeft></RotateLeft>
-    <RotateRight></RotateRight>
-    <RotateFlip></RotateFlip>
+    <RotateLeft>Ctrl+L</RotateLeft>
+    <RotateRight>Ctrl+R</RotateRight>
+    <RotateFlip>Ctrl+F</RotateFlip>
     <RotateCustom></RotateCustom>
     <MoveUp>Ctrl+Up</MoveUp>
     <MoveDown>Ctrl+Down</MoveDown>
@@ -130,5 +140,7 @@
     <About>F1</About>
     <ZoomIn>Ctrl+Oemplus</ZoomIn>
     <ZoomOut>Ctrl+OemMinus</ZoomOut>
+
+
   </KeyboardShortcuts>
 </AppConfig>

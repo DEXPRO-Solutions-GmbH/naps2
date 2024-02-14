@@ -59,7 +59,10 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema id="root" 
+    xmlns="" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -494,6 +497,24 @@
   </data>
   <data name="ListeningOnPort" xml:space="preserve">
     <value>Listening on port {0}</value>
+  </data>
+  <data name="UploadPdfProgress" xml:space="preserve">
+    <value>Upload PDF Progress</value>
+  </data>
+  <data name="UploadingDocuments" xml:space="preserve">
+    <value>Uploading to DOCUMENTS...</value>
+  </data>
+  <data name="ErrorUploading" xml:space="preserve">
+    <value>An Error occurred while uploading</value>
+  </data>
+  <data name="UploadingSqueeze" xml:space="preserve">
+    <value>Uploading to Squeeze...</value>
+  </data>
+  <data name="DetectBarcodeProgress" xml:space="preserve">
+    <value>Detect Barcodes Progress</value>
+  </data>
+  <data name="DetectBarcodeMessage" xml:space="preserve">
+    <value>Detecting Barcodes...</value>
   </data>
   <data name="ScanProgressPage" xml:space="preserve">
     <value>Scanning page {0}...</value>

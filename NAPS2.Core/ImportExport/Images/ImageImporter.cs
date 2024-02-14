@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using NAPS2.Barcode;
 using NAPS2.Logging;
 using NAPS2.Scan;
 using NAPS2.Scan.Images;
@@ -15,10 +16,14 @@ namespace NAPS2.ImportExport.Images
     public class ImageImporter : IImageImporter
     {
         private readonly ThumbnailRenderer thumbnailRenderer;
+        private readonly IBarcodeDetector barcodeDetector;
+        private readonly BarcodeProcessor barcodeProcessor;
 
-        public ImageImporter(ThumbnailRenderer thumbnailRenderer)
+        public ImageImporter(ThumbnailRenderer thumbnailRenderer, IBarcodeDetector barcodeDetector, BarcodeProcessor barcodeProcessor)
         {
             this.thumbnailRenderer = thumbnailRenderer;
+            this.barcodeDetector = barcodeDetector;
+            this.barcodeProcessor = barcodeProcessor;
         }
 
         public ScannedImageSource Import(string filePath, ImportParams importParams, ProgressHandler progressCallback, CancellationToken cancelToken)
@@ -69,8 +74,11 @@ namespace NAPS2.ImportExport.Images
                             {
                                 image.PatchCode = PatchCodeDetector.Detect(toImport);
                             }
-
-                            source.Put(image);
+                            if (importParams.DetectBarcodes != BarcodeDetectionMode.None)
+                            {
+                                image.Barcodes = barcodeDetector.Detect(toImport, importParams.BarcodeParams).ToArray();
+                            }
+                            source.ProcessBarcodesAndPut(image, importParams.DetectBarcodes, barcodeProcessor);
                         }
 
                         progressCallback(frameCount, frameCount);

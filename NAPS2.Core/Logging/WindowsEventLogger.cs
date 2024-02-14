@@ -8,7 +8,7 @@ namespace NAPS2.Logging
 {
     public class WindowsEventLogger : IEventLogger
     {
-        private const string SOURCE_NAME = "NAPS2";
+        private const string SOURCE_NAME = "DOCUMENTS Scanner";
         private const string LOG_NAME = "Application";
 
         private readonly AppConfigManager appConfigManager;

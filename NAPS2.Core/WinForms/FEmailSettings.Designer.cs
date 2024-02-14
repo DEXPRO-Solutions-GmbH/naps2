@@ -94,9 +94,9 @@ namespace NAPS2.WinForms
             // 
             // groupBox1
             // 
+            resources.ApplyResources(this.groupBox1, "groupBox1");
             this.groupBox1.Controls.Add(this.lblProvider);
             this.groupBox1.Controls.Add(this.btnChangeProvider);
-            resources.ApplyResources(this.groupBox1, "groupBox1");
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.TabStop = false;
             // 

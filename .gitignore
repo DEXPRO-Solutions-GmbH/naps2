@@ -1,5 +1,3 @@
-Desktop.ini
-packages/
-*.user
-*.suo
-.vs/
+.vs
+packages
+UpgradeLog.htm

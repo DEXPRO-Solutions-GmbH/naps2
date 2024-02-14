@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using NAPS2.Barcode;
 using NAPS2.ClientServer;
 using NAPS2.Config;
 using NAPS2.ImportExport;
+using NAPS2.ImportExport.Documents;
 using NAPS2.ImportExport.Email;
 using NAPS2.ImportExport.Images;
 using NAPS2.ImportExport.Pdf;
@@ -36,6 +38,8 @@ namespace NAPS2.DI.Modules
             Bind<IPdfImporter>().To<PdfSharpImporter>();
             Bind<IImageImporter>().To<ImageImporter>();
             Bind<IPdfRenderer>().To<GhostscriptPdfRenderer>().InSingletonScope();
+            Bind<IBarcodeDetector>().To<ZXingBarcodeDetector>();
+            Bind<BarcodeProcessor>().ToSelf().InSingletonScope();
 
             // Export
             Bind<IPdfExporter>().To<PdfSharpExporter>();
@@ -63,6 +67,9 @@ namespace NAPS2.DI.Modules
             Bind<PdfSettingsContainer>().ToSelf().InSingletonScope();
             Bind<ImageSettingsContainer>().ToSelf().InSingletonScope();
             Bind<EmailSettingsContainer>().ToSelf().InSingletonScope();
+            Bind<DocumentsSettingsContainer>().ToSelf().InSingletonScope();
+            Bind<BarcodeSettingsContainer>().ToSelf().InSingletonScope();
+            Bind<Lifecycle>().ToSelf().InSingletonScope();
 
             // Host
             Bind<IWorkerServiceFactory>().To<NinjectWorkerServiceFactory>();

@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using NAPS2.Barcode;
 using NAPS2.Logging;
 using NAPS2.Scan;
 using NAPS2.Scan.Images;
@@ -74,9 +75,9 @@ namespace NAPS2.Recovery
             return DeferredSave.Defer();
         }
 
-        public static RecoveryImage CreateNew(ImageFormat fileFormat, ScanBitDepth bitDepth, bool highQuality, List<Transform> transformList)
+        public static RecoveryImage CreateNew(ImageFormat fileFormat, ScanBitDepth bitDepth, bool highQuality, List<Transform> transformList, BarcodeResult[] barcodes, PatchCode patchCode)
         {
-            return new RecoveryImage(fileFormat, bitDepth, highQuality, transformList);
+            return new RecoveryImage(fileFormat, bitDepth, highQuality, transformList, barcodes, patchCode);
         }
 
         public static RecoveryImage LoadExisting(RecoveryIndexImage recoveryIndexImage)
@@ -126,7 +127,7 @@ namespace NAPS2.Recovery
         private bool saved;
         private bool disposed;
 
-        private RecoveryImage(ImageFormat fileFormat, ScanBitDepth bitDepth, bool highQuality, List<Transform> transformList)
+        private RecoveryImage(ImageFormat fileFormat, ScanBitDepth bitDepth, bool highQuality, List<Transform> transformList, BarcodeResult[] barcodes, PatchCode patchCode)
         {
             FileFormat = fileFormat;
             FileName = GetNextFileName() + GetExtension(FileFormat);
@@ -136,7 +137,9 @@ namespace NAPS2.Recovery
                 FileName = FileName,
                 BitDepth = bitDepth,
                 HighQuality = highQuality,
-                TransformList = transformList
+                TransformList = transformList,
+                Barcodes = barcodes,
+                PatchCode = patchCode
             };
         }
 

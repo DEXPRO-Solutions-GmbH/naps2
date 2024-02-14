@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using NAPS2.Barcode;
 using NAPS2.Lang.Resources;
 using NAPS2.Logging;
 using NAPS2.Operation;
@@ -20,14 +21,16 @@ namespace NAPS2.Scan.Wia
     {
         private readonly ScannedImageHelper scannedImageHelper;
         private readonly IBlankDetector blankDetector;
+        private readonly BarcodeProcessor barcodeProcessor;
         private readonly IWorkerServiceFactory workerServiceFactory;
 
         private readonly SmoothProgress smoothProgress = new SmoothProgress();
 
-        public WiaScanOperation(ScannedImageHelper scannedImageHelper, IBlankDetector blankDetector, IWorkerServiceFactory workerServiceFactory)
+        public WiaScanOperation(ScannedImageHelper scannedImageHelper, IBlankDetector blankDetector, IWorkerServiceFactory workerServiceFactory, BarcodeProcessor barcodeProcessor)
         {
             this.scannedImageHelper = scannedImageHelper;
             this.blankDetector = blankDetector;
+            this.barcodeProcessor = barcodeProcessor;
             this.workerServiceFactory = workerServiceFactory;
             AllowCancel = true;
             AllowBackground = true;
@@ -152,6 +155,11 @@ namespace NAPS2.Scan.Wia
                 ScanBitDepth bitDepth = ScanProfile.UseNativeUI ? ScanBitDepth.C24Bit : ScanProfile.BitDepth;
                 var image = new ScannedImage(result, bitDepth, ScanProfile.MaxQuality, ScanProfile.Quality);
                 scannedImageHelper.PostProcessStep2(image, result, ScanProfile, ScanParams, pageNumber);
+                if(barcodeProcessor.ProcessPage(image, ScanParams.DetectBarcodes.SelectHighest(ScanProfile.DetectBarcodes), result, ScanParams.BarcodeParams))
+                {
+                    image.Dispose();
+                    return;
+                }
                 string tempPath = scannedImageHelper.SaveForBackgroundOcr(result, ScanParams);
                 scannedImageHelper.RunBackgroundOcr(image, ScanParams, tempPath);
                 source.Put(image);

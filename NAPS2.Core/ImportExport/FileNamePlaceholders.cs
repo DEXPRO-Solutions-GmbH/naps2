@@ -19,21 +19,23 @@ namespace NAPS2.ImportExport
         public const string NUMBER_3_DIGITS = "$(nnn)";
         public const string NUMBER_2_DIGITS = "$(nn)";
         public const string NUMBER_1_DIGIT = "$(n)";
+        public const string BARCODE = "$(barcode)";
 
-        private static readonly Dictionary<string, Func<DateTime, string>> Placeholders = new Dictionary<string, Func<DateTime, string>>
+        private static readonly Dictionary<string, Func<DateTime, string, string>> Placeholders = new Dictionary<string, Func<DateTime, string, string>>
         {
-            { YEAR_4_DIGITS, dateTime => dateTime.ToString("yyyy") },
-            { YEAR_2_DIGITS, dateTime => dateTime.ToString("yy") },
-            { MONTH_2_DIGITS, dateTime => dateTime.ToString("MM") },
-            { DAY_2_DIGITS, dateTime => dateTime.ToString("dd") },
-            { HOUR_24_CLOCK, dateTime => dateTime.ToString("HH") },
-            { MINUTE_2_DIGITS, dateTime => dateTime.ToString("mm") },
-            { SECOND_2_DIGITS, dateTime => dateTime.ToString("ss") },
+            { YEAR_4_DIGITS, (dateTime, barcode) => dateTime.ToString("yyyy") },
+            { YEAR_2_DIGITS, (dateTime, barcode) => dateTime.ToString("yy") },
+            { MONTH_2_DIGITS, (dateTime, barcode) => dateTime.ToString("MM") },
+            { DAY_2_DIGITS, (dateTime, barcode) => dateTime.ToString("dd") },
+            { HOUR_24_CLOCK, (dateTime, barcode) => dateTime.ToString("HH") },
+            { MINUTE_2_DIGITS, (dateTime, barcode) => dateTime.ToString("mm") },
+            { SECOND_2_DIGITS, (dateTime, barcode) => dateTime.ToString("ss") },
+            { BARCODE, (dateTime, barcode) => barcode ?? "NO_BARCODE" }
         };
 
         private static readonly Regex NumberPlaceholderPattern = new Regex(@"\$\(n+\)");
 
-        public string SubstitutePlaceholders(string fileNameWithPath, DateTime dateTime, bool incrementIfExists = true, int numberSkip = 0, int autoNumberDigits = 0)
+        public string SubstitutePlaceholders(string fileNameWithPath, DateTime dateTime, bool incrementIfExists = true, int numberSkip = 0, int autoNumberDigits = 0, string barcode = null)
         {
             if (fileNameWithPath == null)
             {
@@ -42,7 +44,7 @@ namespace NAPS2.ImportExport
             // Start with environment variables
             string result = Environment.ExpandEnvironmentVariables(fileNameWithPath);
             // Most placeholders don't need a special case
-            result = Placeholders.Aggregate(result, (current, ph) => current.Replace(ph.Key, ph.Value(dateTime)));
+            result = Placeholders.Aggregate(result, (current, ph) => current.Replace(ph.Key, ph.Value(dateTime, barcode)));
             // One does, however
             var match = NumberPlaceholderPattern.Match(result);
             if (match.Success)
@@ -50,7 +52,7 @@ namespace NAPS2.ImportExport
                 result = NumberPlaceholderPattern.Replace(result, "");
                 result = SubstituteNumber(result, match.Index, match.Length - 3, numberSkip, true);
             }
-            else if (autoNumberDigits > 0)
+            else if ((File.Exists(fileNameWithPath) && incrementIfExists) || (autoNumberDigits > 0 && !fileNameWithPath.Contains(BARCODE)))
             {
                 result = result.Insert(result.Length - Path.GetExtension(result).Length, ".");
                 result = SubstituteNumber(result, result.Length - Path.GetExtension(result).Length, autoNumberDigits, numberSkip, incrementIfExists);

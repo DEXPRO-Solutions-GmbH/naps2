@@ -13,6 +13,11 @@ namespace NAPS2.Config
     {
         public const int CURRENT_VERSION = 2;
 
+        public AppConfig()
+        {
+            HideUploadDocumentsButton = true;
+        }
+
         public int Version { get; set; }
 
         public string DefaultCulture { get; set; }
@@ -35,6 +40,10 @@ namespace NAPS2.Config
 
         public bool HideSaveImagesButton { get; set; }
 
+        public bool HideSendButton { get; set; }
+
+        public bool HideUploadDocumentsButton { get; set; }
+
         public bool HideEmailButton { get; set; }
 
         public bool HidePrintButton { get; set; }
@@ -55,6 +64,8 @@ namespace NAPS2.Config
 
         public bool NoUpdatePrompt { get; set; }
 
+        public bool NoExternalDownloadPrompt { get; set; }
+
         public bool DeleteAfterSaving { get; set; }
 
         public bool DisableSaveNotifications { get; set; }
@@ -62,6 +73,10 @@ namespace NAPS2.Config
         public bool SingleInstance { get; set; }
 
         public string ComponentsPath { get; set; }
+
+        public string SendTarget { get; set; }
+
+        public string SendArguments { get; set; }
 
         public double OcrTimeoutInSeconds { get; set; }
 

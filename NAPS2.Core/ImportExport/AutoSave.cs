@@ -90,12 +90,12 @@ namespace NAPS2.ImportExport
             {
                 return (true, null);
             }
-            string subPath = fileNamePlaceholders.SubstitutePlaceholders(settings.FilePath, now, true, i);
+            string subPath = fileNamePlaceholders.SubstitutePlaceholders(settings.FilePath, now, true, i, barcode: images.FirstOrDefault()?.Barcodes?.FirstOrDefault()?.Text);
             if (settings.PromptForFilePath)
             {
                 if (dialogHelper.PromptToSavePdfOrImage(subPath, out string newPath))
                 {
-                    subPath = fileNamePlaceholders.SubstitutePlaceholders(newPath, now, true, i);
+                    subPath = fileNamePlaceholders.SubstitutePlaceholders(newPath, now, true, i, barcode: images.FirstOrDefault()?.Barcodes?.FirstOrDefault()?.Text);
                 }
                 else
                 {
@@ -107,10 +107,10 @@ namespace NAPS2.ImportExport
             {
                 if (File.Exists(subPath))
                 {
-                    subPath = fileNamePlaceholders.SubstitutePlaceholders(subPath, now, true, 0, 1);
+                    subPath = fileNamePlaceholders.SubstitutePlaceholders(subPath, now, true, 0, 1, barcode: images.FirstOrDefault()?.Barcodes?.FirstOrDefault()?.Text);
                 }
                 var op = operationFactory.Create<SavePdfOperation>();
-                if (op.Start(subPath, now, images, pdfSettingsContainer.PdfSettings, ocrManager.DefaultParams, false, null))
+                if (op.Start(subPath, now, images, pdfSettingsContainer.PdfSettings, ocrManager.DefaultParams, false, null, false, false))
                 {
                     operationProgress.ShowProgress(op);
                 }

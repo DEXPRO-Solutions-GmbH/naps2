@@ -21,12 +21,18 @@ namespace NAPS2.Util
 
         private bool shouldCreateEventSource;
         private int returnCode;
+        private string protocolArg = null;
 
         public Lifecycle(StillImage sti, AppConfigManager appConfigManager, WindowsEventLogger windowsEventLogger)
         {
             this.sti = sti;
             this.appConfigManager = appConfigManager;
             this.windowsEventLogger = windowsEventLogger;
+        }
+
+        public string TryGetProtocolArg()
+        {
+            return protocolArg;
         }
 
         /// <summary>
@@ -120,6 +126,14 @@ namespace NAPS2.Util
                     returnCode = 1;
                 }
             }
+
+            var protocolHandlerArg = args.FirstOrDefault(x => x.StartsWith("/ProtocolHandler:"));
+            if(protocolHandlerArg != null)
+            {
+                protocolArg = protocolHandlerArg.Substring(17);
+                if (string.IsNullOrWhiteSpace(protocolArg))
+                    protocolArg = null;
+            }
         }
 
         private bool IsElevated
@@ -168,6 +182,22 @@ namespace NAPS2.Util
                     if (Pipes.SendMessage(process, Pipes.MSG_SCAN_WITH_DEVICE + sti.DeviceID))
                     {
                         // Successful, so this instance can be closed before showing any UI
+                        Environment.Exit(0);
+                    }
+                }
+            }
+
+            // If we have a protocol call to handle, send it to other instances, if there are any
+            if (protocolArg != null)
+            {
+                // See if there's another NAPS2 process running
+                foreach (var process in GetOtherNaps2Processes())
+                {
+                    // Another instance of NAPS2 is running, so send it the "ProtocolHandler" signal
+                    ActivateProcess(process);
+                    if (Pipes.SendMessage(process, Pipes.MSG_PROTOCOLHANDLER + protocolArg))
+                    {
+                        // Successful, so this instance should be closed
                         Environment.Exit(0);
                     }
                 }

@@ -66,19 +66,34 @@ namespace NAPS2.Scan.Images
             return RenderThumbnail(scannedImage, userConfigManager.Config.ThumbnailSize);
         }
 
+        public Task<Bitmap> RenderThumbnail(ScannedImage scannedImage, Pen border)
+        {
+            return RenderThumbnail(scannedImage, userConfigManager.Config.ThumbnailSize, border);
+        }
+
         public Task<Bitmap> RenderThumbnail(ScannedImage scannedImage, int size)
+        {
+            return RenderThumbnail(scannedImage, size, Pens.Black);
+        }
+
+        public Task<Bitmap> RenderThumbnail(ScannedImage scannedImage, int size, Pen border)
         {
             using (var snapshot = scannedImage.Preserve())
             {
-                return RenderThumbnail(snapshot, size);
+                return RenderThumbnail(snapshot, size, border);
             }
         }
 
-        public async Task<Bitmap> RenderThumbnail(ScannedImage.Snapshot snapshot, int size)
+        public Task<Bitmap> RenderThumbnail(ScannedImage.Snapshot snapshot, int size)
+        {
+            return RenderThumbnail(snapshot, size, Pens.Black);
+        }
+
+        public async Task<Bitmap> RenderThumbnail(ScannedImage.Snapshot snapshot, int size, Pen border)
         {
             using (var bitmap = await scannedImageRenderer.Render(snapshot, snapshot.TransformList.Count == 0 ? 0 : size * OVERSAMPLE))
             {
-                return RenderThumbnail(bitmap, size);
+                return RenderThumbnail(bitmap, size, border);
             }
         }
 
@@ -95,6 +110,18 @@ namespace NAPS2.Scan.Images
         /// <returns>The thumbnail bitmap.</returns>
         public virtual Bitmap RenderThumbnail(Bitmap b, int size)
         {
+            return RenderThumbnail(b, size, Pens.Black);
+        }
+
+        /// <summary>
+        /// Gets a bitmap resized to fit within a thumbnail rectangle, including a border around the picture.
+        /// </summary>
+        /// <param name="b">The bitmap to resize.</param>
+        /// <param name="size">The maximum width and height of the thumbnail.</param>
+        /// <param name="border">Sets the border color of the thumbnail.</param>
+        /// <returns>The thumbnail bitmap.</returns>
+        public Bitmap RenderThumbnail(Bitmap b, int size, Pen border)
+        {
             var result = new Bitmap(size, size);
             using (Graphics g = Graphics.FromImage(result))
             {
@@ -110,7 +137,7 @@ namespace NAPS2.Scan.Images
                     width = size;
                     left = 0;
                     // Scale the drawing height to match the original bitmap's aspect ratio
-                    height = (int)(b.Height * (size / (double)b.Width));
+                    height = (int) (b.Height * (size / (double) b.Width));
                     // Center the drawing vertically
                     top = (size - height) / 2;
                 }
@@ -120,7 +147,7 @@ namespace NAPS2.Scan.Images
                     height = size;
                     top = 0;
                     // Scale the drawing width to match the original bitmap's aspect ratio
-                    width = (int)(b.Width * (size / (double)b.Height));
+                    width = (int) (b.Width * (size / (double) b.Height));
                     // Center the drawing horizontally
                     left = (size - width) / 2;
                 }
@@ -131,7 +158,8 @@ namespace NAPS2.Scan.Images
                 var srcRect = new RectangleF(0, 0, b.Width, b.Height);
                 g.DrawImage(b, destRect, srcRect, GraphicsUnit.Pixel);
                 // Draw a border around the orignal bitmap's content, inside the padding
-                g.DrawRectangle(Pens.Black, left, top, width - 1, height - 1);
+
+                g.DrawRectangle(border, left, top, width - 1, height - 1);
             }
 
             return result;

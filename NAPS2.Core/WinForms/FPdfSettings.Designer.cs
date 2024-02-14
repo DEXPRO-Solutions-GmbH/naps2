@@ -86,6 +86,7 @@ namespace NAPS2.WinForms
             // 
             // groupMetadata
             // 
+            resources.ApplyResources(this.groupMetadata, "groupMetadata");
             this.groupMetadata.Controls.Add(this.txtKeywords);
             this.groupMetadata.Controls.Add(this.label6);
             this.groupMetadata.Controls.Add(this.txtSubject);
@@ -94,7 +95,6 @@ namespace NAPS2.WinForms
             this.groupMetadata.Controls.Add(this.label3);
             this.groupMetadata.Controls.Add(this.txtTitle);
             this.groupMetadata.Controls.Add(this.label4);
-            resources.ApplyResources(this.groupMetadata, "groupMetadata");
             this.groupMetadata.Name = "groupMetadata";
             this.groupMetadata.TabStop = false;
             // 
@@ -140,6 +140,7 @@ namespace NAPS2.WinForms
             // 
             // groupProtection
             // 
+            resources.ApplyResources(this.groupProtection, "groupProtection");
             this.groupProtection.Controls.Add(this.clbPerms);
             this.groupProtection.Controls.Add(this.cbShowUserPassword);
             this.groupProtection.Controls.Add(this.cbShowOwnerPassword);
@@ -148,12 +149,12 @@ namespace NAPS2.WinForms
             this.groupProtection.Controls.Add(this.txtOwnerPassword);
             this.groupProtection.Controls.Add(this.lblOwnerPassword);
             this.groupProtection.Controls.Add(this.cbEncryptPdf);
-            resources.ApplyResources(this.groupProtection, "groupProtection");
             this.groupProtection.Name = "groupProtection";
             this.groupProtection.TabStop = false;
             // 
             // clbPerms
             // 
+            resources.ApplyResources(this.clbPerms, "clbPerms");
             this.clbPerms.BackColor = System.Drawing.SystemColors.Control;
             this.clbPerms.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.clbPerms.CheckOnClick = true;
@@ -167,7 +168,6 @@ namespace NAPS2.WinForms
             resources.GetString("clbPerms.Items5"),
             resources.GetString("clbPerms.Items6"),
             resources.GetString("clbPerms.Items7")});
-            resources.ApplyResources(this.clbPerms, "clbPerms");
             this.clbPerms.Name = "clbPerms";
             // 
             // cbShowUserPassword
@@ -259,16 +259,16 @@ namespace NAPS2.WinForms
             // 
             // groupCompat
             // 
-            this.groupCompat.Controls.Add(this.cmbCompat);
             resources.ApplyResources(this.groupCompat, "groupCompat");
+            this.groupCompat.Controls.Add(this.cmbCompat);
             this.groupCompat.Name = "groupCompat";
             this.groupCompat.TabStop = false;
             // 
             // cmbCompat
             // 
+            resources.ApplyResources(this.cmbCompat, "cmbCompat");
             this.cmbCompat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbCompat.FormattingEnabled = true;
-            resources.ApplyResources(this.cmbCompat, "cmbCompat");
             this.cmbCompat.Name = "cmbCompat";
             // 
             // cbSinglePagePdf

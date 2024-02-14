@@ -63,6 +63,33 @@ namespace NAPS2.ImportExport
                     yield return images;
                 }
             }
+            else if (separator == SaveSeparator.Barcode)
+            {
+                var images = new List<ScannedImage>();
+                foreach (var scan in scans)
+                {
+                    foreach (var image in scan)
+                    {
+                        if (image?.Barcodes?.Length > 0)
+                        {
+                            if (images.Count > 0)
+                            {
+                                yield return images;
+                            }
+                            images = new List<ScannedImage>();
+                            images.Add(image);
+                        }
+                        else
+                        {
+                            images.Add(image);
+                        }
+                    }
+                }
+                if (images.Count > 0)
+                {
+                    yield return images;
+                }
+            }
             else
             {
                 yield return scans.SelectMany(x => x.ToList()).ToList();

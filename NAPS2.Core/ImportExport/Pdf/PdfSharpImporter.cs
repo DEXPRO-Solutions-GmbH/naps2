@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using NAPS2.Barcode;
 using NAPS2.Lang.Resources;
 using NAPS2.Logging;
 using NAPS2.Scan;
@@ -27,18 +28,23 @@ namespace NAPS2.ImportExport.Pdf
         private readonly ThumbnailRenderer thumbnailRenderer;
         private readonly ScannedImageRenderer scannedImageRenderer;
         private readonly IPdfRenderer pdfRenderer;
+        private readonly BarcodeProcessor barcodeProcessor;
+        private readonly IBarcodeDetector barcodeDetector;
 
-        public PdfSharpImporter(IErrorOutput errorOutput, IPdfPasswordProvider pdfPasswordProvider, ThumbnailRenderer thumbnailRenderer, ScannedImageRenderer scannedImageRenderer, IPdfRenderer pdfRenderer)
+        public PdfSharpImporter(IErrorOutput errorOutput, IPdfPasswordProvider pdfPasswordProvider, ThumbnailRenderer thumbnailRenderer, ScannedImageRenderer scannedImageRenderer, IPdfRenderer pdfRenderer, BarcodeProcessor barcodeProcessor, IBarcodeDetector barcodeDetector)
         {
             this.errorOutput = errorOutput;
             this.pdfPasswordProvider = pdfPasswordProvider;
             this.thumbnailRenderer = thumbnailRenderer;
             this.scannedImageRenderer = scannedImageRenderer;
             this.pdfRenderer = pdfRenderer;
+            this.barcodeProcessor = barcodeProcessor;
+            this.barcodeDetector = barcodeDetector;
         }
 
         public ScannedImageSource Import(string filePath, ImportParams importParams, ProgressHandler progressCallback, CancellationToken cancelToken)
         {
+            barcodeProcessor.NewBatch();
             var source = new ScannedImageSource.Concrete();
             Task.Factory.StartNew(async () =>
             {
@@ -80,7 +86,7 @@ namespace NAPS2.ImportExport.Pdf
                         pdfRenderer.ThrowIfCantRender();
                         foreach (var page in pages)
                         {
-                            source.Put(await ExportRawPdfPage(page, importParams));
+                            source.ProcessBarcodesAndPut(await ExportRawPdfPage(page, importParams), importParams.DetectBarcodes, barcodeProcessor);
                         }
                     }
                     else
@@ -116,7 +122,7 @@ namespace NAPS2.ImportExport.Pdf
         {
             if (page.CustomValues.Elements.ContainsKey("/NAPS2ImportedPage"))
             {
-                source.Put(await ExportRawPdfPage(page, importParams));
+                source.ProcessBarcodesAndPut(await ExportRawPdfPage(page, importParams), importParams.DetectBarcodes, barcodeProcessor);
                 return;
             }
 
@@ -143,12 +149,14 @@ namespace NAPS2.ImportExport.Pdf
                         string[] arrayElements = elementAsArray.Elements.Select(x => x.ToString()).ToArray();
                         if (arrayElements.Length == 2)
                         {
-                            source.Put(DecodeImage(arrayElements[1], page, xObject, Filtering.Decode(xObject.Stream.Value, arrayElements[0]), importParams));
+                            var image = DecodeImage(arrayElements[1], page, xObject, Filtering.Decode(xObject.Stream.Value, arrayElements[0]), importParams);
+                            source.ProcessBarcodesAndPut(image, importParams.DetectBarcodes, barcodeProcessor);
                         }
                     }
                     else if (elementAsName != null)
                     {
-                        source.Put(DecodeImage(elementAsName.Value, page, xObject, xObject.Stream.Value, importParams));
+                        var image = DecodeImage(elementAsName.Value, page, xObject, xObject.Stream.Value, importParams);
+                        source.ProcessBarcodesAndPut(image, importParams.DetectBarcodes, barcodeProcessor);
                     }
                     else
                     {
@@ -193,6 +201,10 @@ namespace NAPS2.ImportExport.Pdf
                     {
                         image.PatchCode = PatchCodeDetector.Detect(bitmap);
                     }
+                    if(importParams.DetectBarcodes != BarcodeDetectionMode.None)
+                    {
+                        image.Barcodes = barcodeDetector.Detect(bitmap, importParams.BarcodeParams).ToArray();
+                    }
                 }
             }
             return image;
@@ -214,6 +226,10 @@ namespace NAPS2.ImportExport.Pdf
                     if (importParams.DetectPatchCodes)
                     {
                         image.PatchCode = PatchCodeDetector.Detect(bitmap);
+                    }
+                    if (importParams.DetectBarcodes != BarcodeDetectionMode.None)
+                    {
+                        image.Barcodes = barcodeDetector.Detect(bitmap, importParams.BarcodeParams).ToArray();
                     }
                     return image;
                 }
@@ -257,6 +273,10 @@ namespace NAPS2.ImportExport.Pdf
                 if (importParams.DetectPatchCodes)
                 {
                     image.PatchCode = PatchCodeDetector.Detect(bitmap);
+                }
+                if (importParams.DetectBarcodes != BarcodeDetectionMode.None)
+                {
+                    image.Barcodes = barcodeDetector.Detect(bitmap, importParams.BarcodeParams).ToArray();
                 }
                 return image;
             }
@@ -365,6 +385,10 @@ namespace NAPS2.ImportExport.Pdf
                 if (importParams.DetectPatchCodes)
                 {
                     image.PatchCode = PatchCodeDetector.Detect(bitmap);
+                }
+                if (importParams.DetectBarcodes != BarcodeDetectionMode.None)
+                {
+                    image.Barcodes = barcodeDetector.Detect(bitmap, importParams.BarcodeParams).ToArray();
                 }
                 return image;
             }

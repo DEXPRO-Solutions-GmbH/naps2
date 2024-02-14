@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using NAPS2.Barcode;
 using NAPS2.Util;
 
 namespace NAPS2.Scan.Images

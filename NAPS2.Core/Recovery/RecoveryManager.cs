@@ -141,7 +141,7 @@ namespace NAPS2.Recovery
                     {
                         using (var bitmap = new Bitmap(imagePath))
                         {
-                            scannedImage = new ScannedImage(bitmap, indexImage.BitDepth, indexImage.HighQuality, -1);
+                            scannedImage = new ScannedImage(bitmap, indexImage.BitDepth, indexImage.HighQuality, -1, indexImage.Barcodes, indexImage.PatchCode);
                         }
                     }
                     foreach (var transform in indexImage.TransformList)

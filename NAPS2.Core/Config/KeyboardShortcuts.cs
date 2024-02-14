@@ -36,6 +36,21 @@ namespace NAPS2.Config
         public string SaveImagesAll { get; set; }
         public string SaveImagesSelected { get; set; }
 
+        public string UploadDocuments { get; set; }
+        public string UploadDocumentsAll { get; set; }
+        public string UploadDocumentsSelected { get; set; }
+
+        public string UploadSqueeze { get; set; }
+        public string UploadSqueezeAll { get; set; }
+        public string UploadSqueezeSelected { get; set; }
+
+        public string Send { get; set; }
+        public string SendAll { get; set; }
+        public string SendSelected { get; set; }
+
+        public string DetectBarcodes { get; set; }
+        public string BindDocuments { get; set; }
+
         public string EmailPDF { get; set; }
         public string EmailPDFAll { get; set; }
         public string EmailPDFSelected { get; set; }
