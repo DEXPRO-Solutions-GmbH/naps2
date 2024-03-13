@@ -110,9 +110,9 @@ public class DesktopSubFormController : IDesktopSubFormController
     {
         _formFactory.Create<AboutForm>().ShowModal();
     }
-    //Squeeze Anpassung
+    //Changes for Squeeze
     public void ShowSqueezeSettingsForm()
     {
-        _formFactory.Create<SettingsForm>().ShowModal();
+        _formFactory.Create<SqueezeSettingsForm>().ShowModal();
     }
 }

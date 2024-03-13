@@ -2066,7 +2066,7 @@ namespace NAPS2.Lang.Resources {
             }
         }
 
-        // Squeeze Anpassung
+        // Squeeze changes
         internal static string Squeeze
         {
             get
@@ -2095,6 +2095,56 @@ namespace NAPS2.Lang.Resources {
                 return ResourceManager.GetString("SqueezeSettings", resourceCulture);
             }
         }
+        internal static string SqueezeSettingsForm
+        {
+            get
+            {
+                return ResourceManager.GetString("SqueezeSettingsForm", resourceCulture);
+            }
+        }
+        internal static string SQZServerURL
+        {
+            get
+            {
+                return ResourceManager.GetString("ServerURL", resourceCulture);
+            }
+        }
+        internal static string SQZClient
+        {
+            get
+            {
+                return ResourceManager.GetString("Client", resourceCulture);
+            }
+        }
+        internal static string SQZUserName
+        {
+            get
+            {
+                return ResourceManager.GetString("Username", resourceCulture);
+            }
+        }
+        internal static string SQZPassword
+        {
+            get
+            {
+                return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        internal static string SQZClassID
+        {
+            get
+            {
+                return ResourceManager.GetString("ClassID", resourceCulture);
+            }
+        }
+        internal static string KeepSettings
+        {
+            get
+            {
+                return ResourceManager.GetString("KeepSettings", resourceCulture);
+            }
+        }
+
 
         /// <summary>
         ///   Looks up a localized string similar to Start.

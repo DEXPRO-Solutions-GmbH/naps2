@@ -71,11 +71,12 @@ public class DesktopCommands
             Image = iconProvider.GetIcon("folder_picture"),
             Shortcut = Application.Instance.CommonModifier | Keys.O
         };
+
         // Squeeze Icon Shortcut?
         Squeeze = new ActionCommand(desktopController.Squeeze)
         {
             Text = UiStrings.Squeeze,
-            Image = iconProvider.GetIcon("inbox_out-white")
+            Image = iconProvider.GetIcon("SQZUpload")
         };
         SqueezeAll = new ActionCommand(_imageListActions.SelectAll)
         {
@@ -90,6 +91,7 @@ public class DesktopCommands
             Text = UiStrings.SqueezeSettings,
             Image = iconProvider.GetIcon("cog_small")
         };
+
         SaveAll = new ActionCommand(_imageListActions.SaveAllAsPdfOrImages)
         {
             Text = UiStrings.SaveAll,
