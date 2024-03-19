@@ -189,4 +189,6 @@ public class CommonConfig
     [Common]
     public bool DisableScannerSharing { get; set; }
 
+    [User]
+    public bool KeepSettings { get; set; }
 }

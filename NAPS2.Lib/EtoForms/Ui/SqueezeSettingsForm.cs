@@ -11,6 +11,7 @@ namespace NAPS2.EtoForms.Ui
     // TODO: Squeeze Konfigurationsfenster bauen
     internal class SqueezeSettingsForm : EtoDialogBase
     {
+        private readonly DesktopFormProvider _desktopFormProvider;
         private readonly TextBox _server = new();
         private readonly TextBox _client = new();
         private readonly TextBox _user = new();
@@ -18,9 +19,12 @@ namespace NAPS2.EtoForms.Ui
         private readonly TextBox _classID = new();
         private readonly CheckBox _keepSettings = C.CheckBox(UiStrings.KeepSettings);
 
-        public SqueezeSettingsForm(Naps2Config config) : base(config)
+        public SqueezeSettingsForm(Naps2Config config, DesktopSubFormController desktopSubFormController,
+        DesktopFormProvider desktopFormProvider) : base(config)
 
         {
+            _desktopFormProvider = desktopFormProvider;
+            UpdateValues(Config);
         }
 
         protected override void BuildLayout()
@@ -57,6 +61,14 @@ namespace NAPS2.EtoForms.Ui
 
         private void UpdateValues(Naps2Config config)
         {
+            void UpdateCheckbox(CheckBox checkBox, Expression<Func<CommonConfig, bool>> accessor)
+            {
+                checkBox.Checked = config.Get(accessor);
+                checkBox.Enabled = !config.AppLocked.Has(accessor);
+            }
+
+            UpdateCheckbox(_keepSettings, c => c.KeepSettings);
+
             void UpdateTextbox(TextBox textBox, Expression<Func<CommonConfig, bool>> accessor)
             {
                 
@@ -75,6 +87,11 @@ namespace NAPS2.EtoForms.Ui
                     transact.Set(accessor, value);
                 }
             }
+            SetIfChanged(c => c.KeepSettings, _keepSettings.IsChecked());
+            transact.Commit();
+
+            _desktopFormProvider.DesktopForm.Invalidate();
+            _desktopFormProvider.DesktopForm.PlaceProfilesToolbar();
 
         }
 

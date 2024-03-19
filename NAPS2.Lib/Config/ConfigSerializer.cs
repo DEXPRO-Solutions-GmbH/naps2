@@ -122,6 +122,9 @@ public class ConfigSerializer : VersionedSerializer<ConfigStorage<CommonConfig>>
         storage.Set(x => x.OcrAfterScanning, c.OcrDefaultAfterScanning);
         storage.Set(x => x.EventLogging, c.EventLogging);
         storage.Set(x => x.KeyboardShortcuts, c.KeyboardShortcuts ?? new KeyboardShortcuts());
+        // Squeeze Storage
+        storage.Set(x => x.KeepSettings, c.KeepSettings);
+
         return storage;
     }
 
@@ -166,6 +169,9 @@ public class ConfigSerializer : VersionedSerializer<ConfigStorage<CommonConfig>>
         SetIfLocked(x => x.DeleteAfterSaving, c.DeleteAfterSaving, nameof(c.DeleteAfterSaving));
         SetIfLocked(x => x.KeepSession, c.KeepSession, nameof(c.KeepSession));
         SetIfLocked(x => x.SingleInstance, c.SingleInstance, nameof(c.SingleInstance));
+
+        //Squeeze cahnge
+        SetIfLocked(x => x.KeepSettings, c.KeepSettings, nameof(c.KeepSettings));
 
         return storage;
     }

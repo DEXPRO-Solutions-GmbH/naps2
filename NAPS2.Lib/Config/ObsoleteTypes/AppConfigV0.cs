@@ -87,4 +87,8 @@ public class AppConfigV0
     public EventType EventLogging { get; set; }
 
     public KeyboardShortcuts? KeyboardShortcuts { get; set; }
+
+    // Squeeze changes
+
+    public bool KeepSettings { get; set; }
 }
