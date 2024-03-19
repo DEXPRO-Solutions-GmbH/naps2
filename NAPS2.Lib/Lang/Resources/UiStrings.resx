@@ -864,4 +864,40 @@
   <data name="ShareAsService" xml:space="preserve">
     <value>Share even when NAPS2 is closed</value>
   </data>
+  <data name="Client" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="Squeeze" xml:space="preserve">
+    <value>Squeeze</value>
+  </data>
+  <data name="SqueezeAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="SqueezeSelected" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="SqueezeSettings" xml:space="preserve">
+    <value>SQZ Settings</value>
+  </data>
+  <data name="SqueezeSettingsForm" xml:space="preserve">
+    <value>Squeeze Config</value>
+  </data>
+  <data name="KeepSettings" xml:space="preserve">
+    <value>Keep Settings</value>
+  </data>
+  <data name="SQZClassID" xml:space="preserve">
+    <value>Document Class</value>
+  </data>
+  <data name="SQZClient" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="SQZPassword" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="SQZServerURL" xml:space="preserve">
+    <value>Server URL</value>
+  </data>
+  <data name="SQZUserName" xml:space="preserve">
+    <value>Username</value>
+  </data>
 </root>

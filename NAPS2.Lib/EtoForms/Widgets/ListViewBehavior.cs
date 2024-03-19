@@ -39,4 +39,8 @@ public abstract class ListViewBehavior<T> where T : notnull
     public virtual byte[] MergeCustomDragData(byte[][] dataItems) => throw new NotSupportedException();
 
     public virtual DragEffects GetCustomDragEffect(byte[] data) => throw new NotSupportedException();
+
+    // Squeeze change
+
+    public virtual bool KeepSettings => false;
 }
