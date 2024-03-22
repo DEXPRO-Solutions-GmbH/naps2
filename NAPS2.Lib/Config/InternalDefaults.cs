@@ -7,6 +7,7 @@ using NAPS2.Ocr;
 using NAPS2.Pdf;
 using NAPS2.Scan;
 using NAPS2.Scan.Batch;
+using NAPS2.ImportExport.Squeeze;
 
 namespace NAPS2.Config;
 
@@ -96,6 +97,18 @@ public static class InternalDefaults
                 TiffCompression = TiffCompression.Auto
             },
             RememberImageSettings = false,
+
+            // Squeeze changes
+            SqueezeSettings = new SqueezeSettings
+            {
+                SQZURL = "URL",
+                SQZClient = "Mandant",
+                SQZUserName = "Benutzername",
+                SQZPassword = "",
+                SQZClassID = "1"
+            },
+            RememberSqueezeSettings = false,
+
             EmailSettings = new EmailSettings
             {
                 AttachmentName = "Scan.pdf"

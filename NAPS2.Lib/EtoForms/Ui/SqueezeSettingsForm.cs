@@ -5,6 +5,7 @@ using Eto.Forms;
 using NAPS2.EtoForms.Desktop;
 using NAPS2.EtoForms.Layout;
 using NAPS2.EtoForms.Widgets;
+using NAPS2.ImportExport.Squeeze;
 
 namespace NAPS2.EtoForms.Ui
 {
@@ -16,8 +17,9 @@ namespace NAPS2.EtoForms.Ui
         private readonly TextBox _client = new();
         private readonly TextBox _user = new();
         private readonly PasswordBoxWithToggle _ownerPassword = new();
-        private readonly TextBox _classID = new();
-        private readonly CheckBox _keepSettings = C.CheckBox(UiStrings.KeepSettings);
+        private readonly TextBox _class = new();
+        private readonly CheckBox _keepSettings = new() { Text = UiStrings.RememberTheseSettings };
+        private readonly Button _restoreDefaults = new() { Text = UiStrings.RestoreDefaults };
 
         public SqueezeSettingsForm(Naps2Config config, DesktopSubFormController desktopSubFormController,
         DesktopFormProvider desktopFormProvider) : base(config)
@@ -25,6 +27,8 @@ namespace NAPS2.EtoForms.Ui
         {
             _desktopFormProvider = desktopFormProvider;
             UpdateValues(Config);
+
+            _restoreDefaults.Click += RestoreDefaults_Click;
         }
 
         protected override void BuildLayout()
@@ -46,7 +50,7 @@ namespace NAPS2.EtoForms.Ui
                                C.Label(UiStrings.SQZPassword),
                                _ownerPassword,
                                C.Label(UiStrings.SQZClassID),
-                               _classID
+                               _class
                            ),
                                        C.Filler(),
             L.Row(
@@ -61,6 +65,14 @@ namespace NAPS2.EtoForms.Ui
 
         private void UpdateValues(Naps2Config config)
         {
+            _keepSettings.Checked = config.Get(c => c.RememberSqueezeSettings);
+            _server.Text = config.Get(c => c.SqueezeSettings.SQZURL);
+            _client.Text = config.Get(c => c.SqueezeSettings.SQZClient);
+            _user.Text = config.Get(c => c.SqueezeSettings.SQZUserName);
+            _ownerPassword.Text = config.Get(c => c.SqueezeSettings.SQZPassword);
+            _class.Text = config.Get(c => c.SqueezeSettings.SQZClassID);
+
+
             void UpdateCheckbox(CheckBox checkBox, Expression<Func<CommonConfig, bool>> accessor)
             {
                 checkBox.Checked = config.Get(accessor);
@@ -78,6 +90,35 @@ namespace NAPS2.EtoForms.Ui
 
         private void Save()
         {
+            var squeezeSettings = new SqueezeSettings
+            {
+                SQZURL = _server.Text ?? "",
+                SQZClient = _client.Text ?? "",
+                SQZUserName = _user.Text ?? "",
+                SQZPassword = _ownerPassword.Text ?? "",
+                SQZClassID = _class.Text ?? ""
+
+            };
+
+            var runTransact = Config.Run.BeginTransaction();
+            var userTransact = Config.User.BeginTransaction();
+            bool remember = _keepSettings.IsChecked();
+            var transactToWrite = remember ? userTransact : runTransact;
+
+            // when checkbox is clicked save setting
+
+            if (_keepSettings.Checked == true)
+            {
+                runTransact.Remove(c => c.SqueezeSettings);
+                userTransact.Remove(c => c.SqueezeSettings);
+                transactToWrite.Set(c => c.SqueezeSettings, squeezeSettings);
+                userTransact.Set(c => c.RememberSqueezeSettings, remember);
+
+                runTransact.Commit();
+                userTransact.Commit();
+            }
+
+
             var transact = Config.User.BeginTransaction();
             void SetIfChanged<T>(Expression<Func<CommonConfig, T>> accessor, T value)
             {

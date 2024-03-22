@@ -5,6 +5,7 @@ using NAPS2.Pdf;
 using NAPS2.Ocr;
 using NAPS2.Scan;
 using NAPS2.Scan.Batch;
+using NAPS2.ImportExport.Squeeze;
 
 namespace NAPS2.Config.ObsoleteTypes;
 
@@ -54,4 +55,7 @@ public class UserConfigV0
     public KeyboardShortcuts? KeyboardShortcuts { get; set; }
 
     public List<NamedPageSize>? CustomPageSizePresets { get; set; }
+
+    // Squeeze change
+    public SqueezeSettings SqueezeSettings { get; set; } = new();
 }
