@@ -7,6 +7,7 @@ using NAPS2.Ocr;
 using NAPS2.Remoting.Server;
 using NAPS2.Scan;
 using NAPS2.Scan.Batch;
+using NAPS2.ImportExport.Squeeze;
 
 namespace NAPS2.Config;
 
@@ -191,4 +192,14 @@ public class CommonConfig
 
     [User]
     public bool KeepSettings { get; set; }
+
+
+    // Squeeze changes
+
+    [Config]
+    [Common]
+    public SqueezeSettings SqueezeSettings { get; set; } = new();
+
+    [User]
+    public bool RememberSqueezeSettings { get; set; }
 }

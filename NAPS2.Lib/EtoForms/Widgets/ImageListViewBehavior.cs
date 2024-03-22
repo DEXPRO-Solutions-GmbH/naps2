@@ -66,9 +66,5 @@ public class ImageListViewBehavior : ListViewBehavior<UiImage>
         }
         return mergedObj.ToByteArray();
     }
-
-
-    public override bool KeepSettings => _config.Get(c => c.KeepSettings);
-
-
+   
 }

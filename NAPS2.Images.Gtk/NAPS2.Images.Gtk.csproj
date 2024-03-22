@@ -12,11 +12,11 @@
         <PackageTags>naps2</PackageTags>
     </PropertyGroup>
 
-    <Import Project="..\NAPS2.Setup\targets\SdkPackageTargets.targets"/>
+    <Import Project="..\NAPS2.Setup\targets\SdkPackageTargets.targets" />
 
     <ItemGroup>
         <ProjectReference Include="..\NAPS2.Images\NAPS2.Images.csproj" />
-        <PackageReference Include="GtkSharp" Version="3.24.24.38" />
+        <PackageReference Include="GtkSharp" Version="3.24.24.95" />
     </ItemGroup>
 
     <ItemGroup>

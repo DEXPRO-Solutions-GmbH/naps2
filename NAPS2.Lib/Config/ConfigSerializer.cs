@@ -170,7 +170,7 @@ public class ConfigSerializer : VersionedSerializer<ConfigStorage<CommonConfig>>
         SetIfLocked(x => x.KeepSession, c.KeepSession, nameof(c.KeepSession));
         SetIfLocked(x => x.SingleInstance, c.SingleInstance, nameof(c.SingleInstance));
 
-        //Squeeze cahnge
+        //Squeeze change
         SetIfLocked(x => x.KeepSettings, c.KeepSettings, nameof(c.KeepSettings));
 
         return storage;
@@ -215,6 +215,11 @@ public class ConfigSerializer : VersionedSerializer<ConfigStorage<CommonConfig>>
         storage.Set(x => x.EmailSettings, c.EmailSettings);
         storage.Set(x => x.EmailSetup, c.EmailSetup);
         storage.Set(x => x.ThumbnailSize, c.ThumbnailSize);
+
+        // Squeeze change
+        storage.Set(x => x.SqueezeSettings, c.SqueezeSettings);
+
+
         if (c.LastBatchSettings != null)
         {
             storage.Set(x => x.BatchSettings, c.LastBatchSettings);
