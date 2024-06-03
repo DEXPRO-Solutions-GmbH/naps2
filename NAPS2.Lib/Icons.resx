@@ -388,4 +388,10 @@
   <data name="zoom_small" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Icons\zoom-small.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="SQZUpload" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\SQZUpload.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="String" xml:space="preserve">
+    <value>SQZUpload</value>
+  </data>
 </root>
