@@ -9,4 +9,8 @@ public class SaveNotifyStub : ISaveNotify
     public void ImagesSaved(int imageCount, string path)
     {
     }
+    //Squeeze change
+    public void PdfUploaded()
+    {
+    }
 }

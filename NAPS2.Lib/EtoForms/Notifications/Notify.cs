@@ -38,4 +38,9 @@ public class Notify : INotify
     {
         _notificationManager.Show(new UpdateNotification(updateChecker, update));
     }
+    //Squeeze change
+    public void PdfUploaded()
+    {
+        _notificationManager.Show(new UploadedNotification(MiscResources.PdfUploaded));
+    }
 }

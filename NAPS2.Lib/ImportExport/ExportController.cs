@@ -1,9 +1,14 @@
-﻿using NAPS2.EtoForms;
+﻿using Eto.Forms;
+using NAPS2.EtoForms;
 using NAPS2.EtoForms.Notifications;
 using NAPS2.EtoForms.Ui;
 using NAPS2.ImportExport.Email;
 using NAPS2.ImportExport.Images;
 using NAPS2.Pdf;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using System.Text;
+using Eto.Forms;
 
 namespace NAPS2.ImportExport;
 
@@ -241,6 +246,86 @@ public class ExportController : IExportController
         if (_config.Get(c => c.DeleteAfterSaving))
         {
             _imageList.Mutate(new ImageListMutation.DeleteSelected(), ListSelection.From(uiImages));
+        }
+    }
+    //Squeeze upload
+    public async Task<bool> UploadPdfToSqueeze(ICollection<UiImage> uiImages, ISaveNotify notify)
+    {
+        using var images = GetSnapshots(uiImages);
+        //var imageCount = images.Count;
+        if (!images.Any())
+        {
+            return false;
+        }
+
+        // Save the Pdf to a temporary file
+        var tempFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+        tempFolder.Create();
+        string tempPdfPath = Path.Combine(tempFolder.FullName, "naps2Output.pdf");
+
+        try
+        {
+            if (!await DoSavePdf(images, notify, tempPdfPath))
+            {
+                return false;
+            }
+
+            // Upload the Pdf
+            var url = _config.Get(c => c.SqueezeSettings.SQZURL);
+            var client = _config.Get(c => c.SqueezeSettings.SQZClient);
+            var userName = _config.Get(c => c.SqueezeSettings.SQZUserName);
+            var password = _config.Get(c => c.SqueezeSettings.SQZPassword);
+            var batchClassId = _config.Get(c => c.SqueezeSettings.SQZClassID);
+            var (uploadSuccess, reasonPhrase) = await UploadPdfFile(tempPdfPath, url, userName, password, batchClassId);
+
+            if (uploadSuccess)
+            {
+                MaybeDeleteAfterSaving(uiImages);
+                notify.PdfUploaded();
+                return true;
+            }
+            else
+            {
+                MessageBox.Show($"Upload failed: {reasonPhrase}", MessageBoxType.Error);
+                return false;
+            }
+        }
+        finally
+        {
+            if (File.Exists(tempPdfPath))
+            {
+                File.Delete(tempPdfPath);
+            }
+            tempFolder.Delete(true);
+        }
+    }
+    // Squeeze Upload
+    private async Task<(bool IsSuccess, string? ReasonPhrase)> UploadPdfFile(string filePath, string url, string username, string password, int batchClassId)
+    {
+        try
+        {
+            using var httpClient = new HttpClient();
+            var authToken = Encoding.ASCII.GetBytes($"{username}:{password}");
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authToken));
+
+            using var form = new MultipartFormDataContent();
+            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            using var fileContent = new StreamContent(fileStream);
+
+            fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/pdf");
+            form.Add(fileContent, "file", Path.GetFileName(filePath));
+
+            // Add additional field here
+            form.Add(new StringContent(batchClassId.ToString()), "batchClassId");
+
+            HttpResponseMessage response = await httpClient.PostAsync(url, form);
+
+            return (response.IsSuccessStatusCode, response.ReasonPhrase);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, MessageBoxType.Error);
+            return (false, ex.Message);
         }
     }
 }

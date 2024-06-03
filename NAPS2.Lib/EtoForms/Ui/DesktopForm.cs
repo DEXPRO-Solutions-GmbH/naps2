@@ -69,12 +69,8 @@ public abstract class DesktopForm : EtoFormBase
         _desktopSubFormController = desktopSubFormController;
         Commands = commands;
 
-        if (!EtoPlatform.Current.IsMac)
-        {
-            // For Mac the menu shortcuts work without needing manual hooks
-            // Maybe at some point we can support custom assignment on Mac, though we'll need to fix Ctrl vs Command
-            _keyboardShortcuts.Assign(Commands);
-        }
+
+        _keyboardShortcuts.Assign(Commands);
         CreateToolbarsAndMenus();
         UpdateScanButton();
         UpdateProfilesToolbar();
@@ -260,7 +256,7 @@ public abstract class DesktopForm : EtoFormBase
         // CreateToolbarSeparator();
         // Anpassung für den Squeeze Button
         if (!hiddenButtons.HasFlag(ToolbarButtons.Squeeze))
-            CreateToolbarButtonWithMenu(Commands.Squeeze, DesktopToolbarMenuType.Squeeze, new MenuProvider()
+            CreateToolbarButtonWithMenu(Commands.UploadToSqueeze, DesktopToolbarMenuType.Squeeze, new MenuProvider()
                 .Append(Commands.SqueezeAll)
                 .Append(Commands.SqueezeSelected)
                 .Separator()

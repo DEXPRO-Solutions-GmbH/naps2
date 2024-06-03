@@ -105,7 +105,7 @@ public static class InternalDefaults
                 SQZClient = "Mandant",
                 SQZUserName = "Benutzername",
                 SQZPassword = "",
-                SQZClassID = "1"
+                SQZClassID = 1
             },
             RememberSqueezeSettings = false,
 

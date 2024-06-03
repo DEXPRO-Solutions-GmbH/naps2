@@ -75,7 +75,7 @@ public class DesktopCommands
         // Squeeze Icon Shortcut?
         Squeeze = new ActionCommand(desktopController.Squeeze)
         {
-            Text = UiStrings.Squeeze,
+            Text = UiStrings.UploadToSqueeze,
             Image = iconProvider.GetIcon("SQZUpload")
         };
         SqueezeAll = new ActionCommand(_imageListActions.SelectAll)
@@ -334,6 +334,21 @@ public class DesktopCommands
             Text = UiStrings.Paste,
             Shortcut = Application.Instance.CommonModifier | Keys.V
         };
+        //Squeeze
+        UploadAllToSqueeze = new ActionCommand(imageListActions.UploadAllToSqueeze)
+        {
+            Text = UiStrings.UploadAllToSqueeze
+        };
+        UploadSelectedToSqueeze = new ActionCommand(imageListActions.UploadSelectedToSqueeze)
+        {
+            Text = UiStrings.UploadSelectedToSqueeze
+        };
+
+        UploadToSqueeze = new ActionCommand(imageListActions.UploadAllToSqueeze)
+        {
+            Text = UiStrings.UploadToSqueeze,
+            Image = iconProvider.GetIcon("SQZUpload")
+        };
     }
 
     public DesktopCommands WithSelection(Func<ListSelection<UiImage>> selectionFunc)
@@ -412,4 +427,7 @@ public class DesktopCommands
     public ActionCommand SelectAll { get; set; }
     public ActionCommand Copy { get; set; }
     public ActionCommand Paste { get; set; }
+    public ActionCommand UploadToSqueeze { get; set; }
+    public ActionCommand UploadAllToSqueeze { get; set; }
+    public ActionCommand UploadSelectedToSqueeze { get; set; }
 }

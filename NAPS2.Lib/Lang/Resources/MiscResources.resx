@@ -498,4 +498,7 @@
   <data name="AcquiringData" xml:space="preserve">
     <value>Acquiring data...</value>
   </data>
+  <data name="PdfUploaded" xml:space="preserve">
+    <value>PDF has been successfully uploaded to Squeeze.</value>
+  </data>
 </root>

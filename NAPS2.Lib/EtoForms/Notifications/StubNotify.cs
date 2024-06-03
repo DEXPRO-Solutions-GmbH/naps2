@@ -23,4 +23,8 @@ public class StubNotify : INotify
     public void UpdateAvailable(IUpdateChecker updateChecker, UpdateInfo update)
     {
     }
+    //Squeeze change
+    public void PdfUploaded()
+    {
+    }
 }
