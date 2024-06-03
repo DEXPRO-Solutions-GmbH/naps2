@@ -17,7 +17,7 @@ namespace NAPS2.EtoForms.Ui
         private readonly TextBox _client = new();
         private readonly TextBox _user = new();
         private readonly PasswordBoxWithToggle _ownerPassword = new();
-        private readonly TextBox _class = new();
+        private readonly NumericStepper _class = new NumericStepper { MinValue = 1, MaxValue = int.MaxValue, Value = 1 };
         private readonly CheckBox _keepSettings = new() { Text = UiStrings.RememberTheseSettings };
         private readonly Button _restoreDefaults = new() { Text = UiStrings.RestoreDefaults };
 
@@ -27,6 +27,7 @@ namespace NAPS2.EtoForms.Ui
         {
             _desktopFormProvider = desktopFormProvider;
             UpdateValues(Config);
+            //BuildLayout();
 
             _restoreDefaults.Click += RestoreDefaults_Click;
         }
@@ -70,7 +71,7 @@ namespace NAPS2.EtoForms.Ui
             _client.Text = config.Get(c => c.SqueezeSettings.SQZClient);
             _user.Text = config.Get(c => c.SqueezeSettings.SQZUserName);
             _ownerPassword.Text = config.Get(c => c.SqueezeSettings.SQZPassword);
-            _class.Text = config.Get(c => c.SqueezeSettings.SQZClassID);
+            _class.Value = config.Get(c => c.SqueezeSettings.SQZClassID);
 
 
             void UpdateCheckbox(CheckBox checkBox, Expression<Func<CommonConfig, bool>> accessor)
@@ -96,7 +97,7 @@ namespace NAPS2.EtoForms.Ui
                 SQZClient = _client.Text ?? "",
                 SQZUserName = _user.Text ?? "",
                 SQZPassword = _ownerPassword.Text ?? "",
-                SQZClassID = _class.Text ?? ""
+                SQZClassID = (int)_class.Value  
 
             };
 

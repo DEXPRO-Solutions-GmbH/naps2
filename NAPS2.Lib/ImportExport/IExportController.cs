@@ -8,4 +8,6 @@ public interface IExportController
     Task<bool> SaveImages(ICollection<UiImage> uiImages, ISaveNotify notify);
     Task<bool> SavePdfOrImages(ICollection<UiImage> uiImages, ISaveNotify notify);
     Task<bool> EmailPdf(ICollection<UiImage> uiImages);
+    //Squeeze 
+    Task<bool> UploadPdfToSqueeze(ICollection<UiImage> uiImages, ISaveNotify notify);
 }

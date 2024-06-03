@@ -17,4 +17,6 @@ public interface ISaveNotify
     /// <param name="imageCount"></param>
     /// <param name="path"></param>
     void ImagesSaved(int imageCount, string path);
+    // Massage for Squeeze Upload
+    void PdfUploaded();
 }

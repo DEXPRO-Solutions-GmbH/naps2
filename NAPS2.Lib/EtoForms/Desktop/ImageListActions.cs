@@ -101,4 +101,7 @@ public class ImageListActions
     public Task SaveSelectedAsPdfOrImages() => _exportController.SavePdfOrImages(_imageList.Selection, _notify);
     public Task EmailAllAsPdf() => _exportController.EmailPdf(_imageList.Images);
     public Task EmailSelectedAsPdf() => _exportController.EmailPdf(_imageList.Selection);
+    //Squueze
+    public Task UploadAllToSqueeze() => _exportController.UploadPdfToSqueeze(_imageList.Images, _notify);
+    public Task UploadSelectedToSqueeze() => _exportController.UploadPdfToSqueeze(_imageList.Selection, _notify);
 }
