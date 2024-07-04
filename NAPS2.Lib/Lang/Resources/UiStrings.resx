@@ -900,4 +900,13 @@
   <data name="SQZUserName" xml:space="preserve">
     <value>Username</value>
   </data>
+  <data name="UploadToSqueeze" xml:space="preserve">
+    <value>Squeeze</value>
+  </data>
+  <data name="UploadAllToSqueeze" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="UploadSelectedToSqueeze" xml:space="preserve">
+    <value>Select</value>
+  </data>
 </root>

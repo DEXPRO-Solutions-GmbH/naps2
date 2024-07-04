@@ -2266,6 +2266,33 @@ namespace NAPS2.Lang.Resources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die All ähnelt.
+        /// </summary>
+        internal static string UploadAllToSqueeze {
+            get {
+                return ResourceManager.GetString("UploadAllToSqueeze", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Select ähnelt.
+        /// </summary>
+        internal static string UploadSelectedToSqueeze {
+            get {
+                return ResourceManager.GetString("UploadSelectedToSqueeze", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Squeeze ähnelt.
+        /// </summary>
+        internal static string UploadToSqueeze {
+            get {
+                return ResourceManager.GetString("UploadToSqueeze", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Use native UI ähnelt.
         /// </summary>
         internal static string UseNativeUi {
@@ -2312,7 +2339,7 @@ namespace NAPS2.Lang.Resources {
                 return ResourceManager.GetString("UploadToSqueeze", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die View ähnelt.
         /// </summary>
