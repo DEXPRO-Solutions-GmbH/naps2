@@ -2318,27 +2318,27 @@ namespace NAPS2.Lang.Resources {
                 return ResourceManager.GetString("UserPasswordLabel", resourceCulture);
             }
         }
-        internal static string UploadAllToSqueeze
-        {
-            get
-            {
-                return ResourceManager.GetString("UploadAllToSqueeze", resourceCulture);
-            }
-        }
-        internal static string UploadSelectedToSqueeze
-        {
-            get
-            {
-                return ResourceManager.GetString("UploadSelectedToSqueeze", resourceCulture);
-            }
-        }
-        internal static string UploadToSqueeze
-        {
-            get
-            {
-                return ResourceManager.GetString("UploadToSqueeze", resourceCulture);
-            }
-        }
+        //internal static string UploadAllToSqueeze
+        //{
+        //    get
+        //    {
+        //        return ResourceManager.GetString("UploadAllToSqueeze", resourceCulture);
+        //    }
+        //}
+        //internal static string UploadSelectedToSqueeze
+        //{
+        //    get
+        //    {
+        //        return ResourceManager.GetString("UploadSelectedToSqueeze", resourceCulture);
+        //    }
+        //}
+        //internal static string UploadToSqueeze
+        //{
+        //    get
+        //    {
+        //        return ResourceManager.GetString("UploadToSqueeze", resourceCulture);
+        //    }
+        //}
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die View ähnelt.
